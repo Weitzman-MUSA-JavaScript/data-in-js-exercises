@@ -31,12 +31,67 @@ function initPollingPlaceMap(elementOrId) {
 }
 
 /**
+ * Sums the values in an array.
+ * @param {number[]} arr The array of numbers to sum.
+ * @returns {number} The sum of the array values.
+ */
+function sum(arr) {
+  return arr.reduce((a, b) => a + b, 0);
+}
+
+/**
  * Fetches the polling place data from OpenDataPhilly AND 
  * AGGREGATES IT BASED ON UNIQUE STREET ADDRESSES.
  * @returns {Promise<GeoJSON.FeatureCollection>} The deduplicated polling place data.
  */
 async function getPollingPlaceData() {
-  // ... Your code here ...
+  const resp = await fetch('https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id');
+  const data = await resp.json();
+
+  const dedupedData = {
+    'type': 'FeatureCollection',
+    'features': data.features.reduce((pollingPlaces, precinct) => {
+      const address = precinct.properties.street_address;
+      let pollingPlace = pollingPlaces.find(pp => pp.properties.street_address == address);
+
+      if (!pollingPlace) {
+        pollingPlace = {
+          'type': 'Feature',
+          'properties': {
+            placename: precinct.properties.placename,
+            street_address: precinct.properties.street_address,
+            zip_code: precinct.properties.zip_code,
+            accessibility_code: precinct.properties.accessibiilty_code,
+            parking_code: precinct.properties.parking_code,
+            coords: [precinct.geometry.coordinates],
+            precincts: [{
+              ward: precinct.properties.ward,
+              division: precinct.properties.division,
+              precinct: precinct.properties.precinct,
+            }],
+          },
+          'geometry': { ...precinct.geometry },
+        };
+        pollingPlaces.push(pollingPlace);
+      }
+
+      else {
+        pollingPlace.properties.coords.push(precinct.geometry.coordinates);
+        pollingPlace.properties.precincts.push({
+          ward: precinct.properties.ward,
+          division: precinct.properties.division,
+          precinct: precinct.properties.precinct,
+        });
+        pollingPlace.geometry.coordinates = [
+          sum(pollingPlace.properties.coords.map(c => c[0])) / pollingPlace.properties.coords.length,
+          sum(pollingPlace.properties.coords.map(c => c[1])) / pollingPlace.properties.coords.length,
+        ];
+      }
+      return pollingPlaces;
+    }, []),
+  };
+
+  return dedupedData;
 }
 
 /**
@@ -65,7 +120,11 @@ async function initPollingPlaceLayer(map) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: function (feature, layer) {
-      layer.bindPopup(`...`);
+      layer.bindPopup(`
+        ${feature.properties['placename']}<br>
+        ${feature.properties['street_address']}<br>
+        Precincts: ${feature.properties['precincts'].map(p => p.precinct).join(', ')}
+      `);
     }
   }).addTo(map);
 
