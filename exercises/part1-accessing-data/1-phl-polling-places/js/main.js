@@ -35,6 +35,13 @@ function initPollingPlaceMap(elementOrId) {
  */
 async function getPollingPlaceData() {
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  const resp = await fetch('https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id');
+  const data = await resp.json();
+
+  return data;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -63,7 +70,15 @@ async function initPollingPlaceLayer(map) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: (feature, layer) => {
-      layer.bindPopup(`...`);
+      // layer.bindPopup(`... Your code here ...`);
+
+      // === BEGIN SAMPLE SOLUTION ===
+      layer.bindPopup(`
+        ${feature.properties['placename']}<br>
+        ${feature.properties['street_address']}<br>
+        Precinct: ${feature.properties['precinct']}
+      `);
+      // === END SAMPLE SOLUTION ===
     }
   }).addTo(map);
 
