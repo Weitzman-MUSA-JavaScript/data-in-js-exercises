@@ -17,6 +17,10 @@ INSTRUCTIONS
 
 /* globals L */
 
+// === BEGIN SAMPLE SOLUTION ===
+import _ from 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/+esm';
+// === END SAMPLE SOLUTION ===
+
 /**
  * Creates a polling places Leaflet map object.
  * @param {string|HTMLElement} elementOrId The DOM element where the map will live
@@ -38,6 +42,53 @@ function initPollingPlaceMap(elementOrId) {
  */
 async function getPollingPlaceData() {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const resp = await fetch('https://phl.carto.com/api/v2/sql?q=SELECT+*+FROM+polling_places&filename=polling_places&format=geojson&skipfields=cartodb_id');
+  const data = await resp.json();
+
+  const dedupedData = {
+    'type': 'FeatureCollection',
+    'features': data.features.reduce((pollingPlaces, precinct) => {
+      const address = precinct.properties.street_address;
+      let pollingPlace = pollingPlaces.find((pp) => pp.properties.street_address == address);
+
+      if (!pollingPlace) {
+        pollingPlace = {
+          'type': 'Feature',
+          'properties': {
+            placename: precinct.properties.placename,
+            street_address: precinct.properties.street_address,
+            zip_code: precinct.properties.zip_code,
+            accessibility_code: precinct.properties.accessibility_code,
+            parking_code: precinct.properties.parking_code,
+            coords: [precinct.geometry.coordinates],
+            precincts: [{
+              ward: precinct.properties.ward,
+              division: precinct.properties.division,
+              precinct: precinct.properties.precinct,
+            }],
+          },
+          'geometry': { ...precinct.geometry },
+        };
+        pollingPlaces.push(pollingPlace);
+      } else {
+        pollingPlace.properties.coords.push(precinct.geometry.coordinates);
+        pollingPlace.properties.precincts.push({
+          ward: precinct.properties.ward,
+          division: precinct.properties.division,
+          precinct: precinct.properties.precinct,
+        });
+        pollingPlace.geometry.coordinates = [
+          _.sum(pollingPlace.properties.coords.map((c) => c[0])) / pollingPlace.properties.coords.length,
+          _.sum(pollingPlace.properties.coords.map((c) => c[1])) / pollingPlace.properties.coords.length,
+        ];
+      }
+      return pollingPlaces;
+    }, []),
+  };
+
+  return dedupedData;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -66,7 +117,14 @@ async function initPollingPlaceLayer(map) {
       return L.marker(latlng, { icon: icon });
     },
     onEachFeature: function (feature, layer) {
-      layer.bindPopup(`...`);
+      // layer.bindPopup(`... Your code here ...`);
+      // === BEGIN SAMPLE SOLUTION ===
+      layer.bindPopup(`
+        ${feature.properties['placename']}<br>
+        ${feature.properties['street_address']}<br>
+        Precincts: ${feature.properties['precincts'].map((p) => p.precinct).join(', ')}
+      `);
+      // === END SAMPLE SOLUTION ===
     },
   }).addTo(map);
 
