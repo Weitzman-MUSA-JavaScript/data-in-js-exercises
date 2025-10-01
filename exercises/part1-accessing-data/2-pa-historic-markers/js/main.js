@@ -53,6 +53,31 @@ async function getHistoricMarkerData(keyword, categories) {
   //    categories, e.g.: &markerCategories=2&markerCategories=3
 
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  const loadingDialog = document.getElementById('loading-dialog');
+  loadingDialog.showModal();
+
+  const queryCategories = categories.map(code => `&markerCategories=${code}`).join('');
+  const url = `https://corsproxy.io/?url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=${keyword || ''}&countyCode=${philadelphiaCountyCode}&municipalities=${philadelphiaMunicipalityCode}${queryCategories}&markerMissing=`;
+  try {
+    const resp = await fetch(url);
+    const data = await resp.json();
+
+    loadingDialog.close();
+
+    if (data.length === 0) {
+      alert('No historic markers found with the given filters.');
+    }
+
+    return data;
+  } catch (error) {
+    loadingDialog.close();
+    alert('Error fetching historic marker data. Please try again later.');
+    console.error('Error fetching historic marker data:', error);
+    return [];
+  }
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -65,6 +90,44 @@ async function updateHistoricMarkerLayer(layer, keyword, categories) {
   const historicMarkers = await getHistoricMarkerData(keyword, categories);
 
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  
+  // Note that I could simply clear away everything from the layer group and
+  // re-add all the markers, but that would be inefficient if only a few
+  // markers changed. Instead, I will remove any markers that are no longer
+  // present and only add new markers that aren't already on the map.
+  //
+  // To do this, I create a Set of the historicalMarkerNum values from the
+  // fetched data, then iterate over the existing markers in the layer group.
+  // If any existing marker's historicalMarkerNum is not in the Set, I remove
+  // it from the layer. Otherwise, I add it to a Map of existing markers for
+  // easy lookup later. Finally, I iterate over the fetched data and add any
+  // markers that aren't already in the existingMarkers Map.
+  //
+  // Note: historicalMarkerNum is a unique identifier for each marker.
+  // Also note: This is more complicated than strictly necessary for this
+  //            exercise, but it's a useful pattern for efficiently updating
+  //            map layers.
+  const historicMarkerNums = new Set(historicMarkers.map(m => m.historicalMarkerNum));
+  const existingMarkers = new Map();
+  layer.eachLayer((marker) => {
+    if (!historicMarkerNums.has(marker.historicalMarkerNum)) {
+      layer.removeLayer(marker);
+    } else {
+      existingMarkers.set(marker.historicalMarkerNum, marker);
+    }
+  });
+
+  for (const historicMarker of historicMarkers) {
+    const { historicalMarkerNum, latitude, longitude, markerTitle, markerText } = historicMarker;
+    if (existingMarkers.has(historicalMarkerNum)) { continue; }
+
+    const marker = L.marker([latitude, longitude]).addTo(layer);
+    marker.historicalMarkerNum = historicalMarkerNum;
+    marker.bindPopup(`<strong>${markerTitle}</strong><br>${markerText}`);
+    existingMarkers.set(historicalMarkerNum, marker);
+  }
+  // === END SAMPLE SOLUTION ===
 }
 
 /** Handles the form submission event to update the historic marker layer.
