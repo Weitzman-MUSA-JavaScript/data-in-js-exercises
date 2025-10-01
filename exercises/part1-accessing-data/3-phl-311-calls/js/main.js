@@ -62,6 +62,15 @@ const callsListElement = document.getElementById("calls-list");
  */
 async function fetchCallsData() {
   // ... Your code here ...
+  try {
+    // Use D3 to fetch and parse the CSV data
+    const data = await d3.csv(API_URL);
+    return data;
+  } catch (error) {
+    console.error("Error fetching calls data:", error);
+    alert("Error loading data. Please try again later.");
+    throw error;
+  }
 }
 
 /**
@@ -104,6 +113,24 @@ function getStatusClass(status) {
  */
 function createCallListItem(call) {
   // ... Your code here ...
+  const serviceName = call.service_name || "Service Request";
+  const address = call.address || "";
+  const requestedDate = call.requested_datetime ? formatDate(call.requested_datetime) : "";
+  const status = call.status || "";
+  const statusClass = status ? getStatusClass(status) : "status-open";
+
+  const html = `
+    <li class="call-item">
+      <div>
+        <div class="call-service-name">${serviceName}</div>
+        ${ address ? `<div class="call-address">📍 ${address}</div>` : "" }
+        ${ requestedDate ? `<div class="call-date">Requested: ${requestedDate}</div>` : "" }
+        ${ status ? `<span class="call-status ${statusClass}">${status}</span>` : "" }
+      </div>
+    </li>
+    `;
+
+  return htmlToElement(html);
 }
 
 /**
