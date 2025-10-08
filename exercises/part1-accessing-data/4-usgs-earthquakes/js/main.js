@@ -40,6 +40,13 @@ function initEarthquakeMap(elementOrId) {
  */
 async function getEarthquakeData() {
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  const resp = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson');
+  const data = await resp.json();
+
+  return data;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -51,7 +58,10 @@ function getRadiusFromMagnitude(magnitude) {
   // Scale magnitude to reasonable pixel radius
   // Magnitude typically ranges from 0-10; re-scale to 2-50 pixels
   
-  return // ... Your code here ...;
+  // return // ... Your code here ...;
+  // === BEGIN SAMPLE SOLUTION ===
+  return Math.max(2, magnitude * 5);
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -80,9 +90,41 @@ async function initEarthquakeLayer(map) {
   const layer = L.geoJSON(earthquakeData, {
     pointToLayer: (feature, latlng) => {
       // ... Your code here ...
+
+      // === BEGIN SAMPLE SOLUTION ===
+      const magnitude = feature.properties.mag || 0;
+      const depth = feature.geometry.coordinates[2] || 0; // Depth is the 3rd coordinate
+      
+      return L.circleMarker(latlng, {
+        radius: getRadiusFromMagnitude(magnitude),
+        fillColor: getColorFromDepth(depth),
+        color: '#000',
+        weight: 1,
+        opacity: 0.8,
+        fillOpacity: 0.6
+      });
+      // === END SAMPLE SOLUTION ===
     },
     onEachFeature: (feature, layer) => {
       // layer.bindPopup(`... Your code here ...`);
+
+      // === BEGIN SAMPLE SOLUTION ===
+      const props = feature.properties;
+      const coords = feature.geometry.coordinates;
+      const magnitude = props.mag || 'Unknown';
+      const depth = coords[2] || 'Unknown';
+      const time = props.time ? new Date(props.time).toLocaleString() : 'Unknown';
+      
+      layer.bindTooltip(props.title || 'No title');
+      
+      layer.bindPopup(`
+        <strong>${props.title}</strong><br>
+        <strong>Magnitude:</strong> ${magnitude}<br>
+        <strong>Depth:</strong> ${depth} km<br>
+        <strong>Time:</strong> ${time}<br>
+        <a href="${props.url}" target="_blank">More details</a>
+      `);
+      // === END SAMPLE SOLUTION ===
     }
   }).addTo(map);
 
