@@ -14,6 +14,14 @@ let currentStatusFilter = null;
  */
 function aggregateCallsByStatus(calls) {
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  return calls.reduce((acc, call) => {
+    const status = call.status || 'Unknown';
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
+  // === END SAMPLE SOLUTION ===
 }
 
 /**

@@ -14,6 +14,14 @@ let currentCallTypeFilter = null;
  */
 function aggregateCallsByType(calls) {
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  return calls.reduce((acc, call) => {
+    const serviceType = call.service_name || 'Unknown';
+    acc[serviceType] = (acc[serviceType] || 0) + 1;
+    return acc;
+  }, {});
+  // === END SAMPLE SOLUTION ===
 }
 
 /**

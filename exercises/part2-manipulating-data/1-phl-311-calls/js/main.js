@@ -75,6 +75,17 @@ async function fetchCallsData(callsToFetch = 200, callsToSkip = 0) {
   // fetch the first 200 calls, then the next 200, and so on.
 
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  try {
+    // Use D3 to fetch and parse the CSV data
+    const data = await d3.csv(API_URL);
+    return data;
+  } catch (error) {
+    console.error("Error fetching calls data:", error);
+    alert("Error loading data. Please try again later.");
+    throw error;
+  }
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -88,6 +99,19 @@ function filterCalls(calls) {
 
   // ... Your code here ...
 
+  // === BEGIN SAMPLE SOLUTION ===
+  let filtered = calls;
+
+  if (typeFilter) {
+    filtered = filtered.filter(call => call.service_name === typeFilter);
+  }
+
+  if (statusFilter) {
+    filtered = filtered.filter(call => call.status === statusFilter);
+  }
+
+  return filtered;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
