@@ -93,6 +93,35 @@ async function getCountriesData(regionCode = '', page = 1) {
   // }
 
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  let url;
+  if (regionCode) {
+    url = `https://api.worldbank.org/v2/region/${regionCode}/country?format=json&page=${page}`;
+  } else {
+    url = `https://api.worldbank.org/v2/country?format=json&page=${page}`;
+  }
+
+  const response = await fetch(url);
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  
+  // World Bank API returns [metadata, data]
+  const metadata = data[0] || {};
+  const countries = data[1] || [];
+  
+  return {
+    countries,
+    page: metadata.page || 1,
+    perPage: metadata.per_page || 50,
+    total: metadata.total || 0,
+    totalPages: metadata.pages || 1,
+  };
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -102,6 +131,24 @@ async function getCountriesData(regionCode = '', page = 1) {
  */
 function createCountryListItem(country) {
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  const countryName = country.name || 'Unknown Country';
+  const countryCode = country.iso2Code || '';
+  const capitalCity = country.capitalCity || '';
+  
+  const html = `
+    <li>
+      <div class="country-name">
+        ${countryName}
+        ${countryCode ? `<span class="country-code">(${countryCode})</span>` : ''}
+      </div>
+      ${capitalCity ? `<div class="country-capital">Capital: ${capitalCity}</div>` : ''}
+    </li>
+  `;
+  
+  return htmlToElement(html);
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
