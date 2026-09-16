@@ -19,9 +19,12 @@ This is the most advanced part, where you must perform a "join" by combining two
 ### **Exercise Ideas**
 
 1. **Choropleth Map of Median Income:**
-    * **Goal:** Create a choropleth map showing the median household income by neighborhood. 🗺️
-    * **Skills:** This requires an **attribute join**. First, fetch both the Neighborhoods GeoJSON and the income CSV (using a library like PapaParse.js for the CSV). Convert the array of CSV data into a JavaScript `Map` or an object for easy lookup, where the key is the neighborhood name or ID. Then, loop through the GeoJSON `features` array. For each neighborhood feature, use its name (`feature.properties.name`) to look up its corresponding income from the data map you created. Add this income value as a new property to the GeoJSON feature. Finally, use this new income property to style the color of each neighborhood polygon on the Leaflet map.
-    * **Result:** A classic color-coded map showing wealth distribution across the city.
+    * **Goal:** Create a choropleth map showing the median household income at different US Census geography levels. 🗺️
+
+      The map should start showing the entire US, with income data by county and with each state outlined with a thick outline (i.e., use the `us_counties_simplified.geojson` file and the `us_states_simplified.geojson` file). When you click on a state, the map should zoom in to that state and update to show income by census tract (using the relevant `state_{state_fips_code}_tracts_simplified.geojson` file for that state, with each of the counties outlined with a thick outline).
+      
+    * **Skills:** This requires an **attribute join**. You'll fetch the Census geographies GeoJSON files that I've added to this repository, and the income data from the Census API (using a URLs such as <https://api.census.gov/data/2023/acs/acs5?get=NAME,B06011_001E&for=tract:*&in=state:42> where `state:42` refers to PA, and `B06011_001E` refers to the median household income variable as documented in the [Census ACS API](https://api.census.gov/data/2023/acs/acs5/variables.html)). Convert the array of data into a JavaScript `Map`, or a simple object, for easy lookup, where the key is the state, county, or tract GeoID. Then, update the GeoJSON `features` with the corresponding income from the data map you created. Finally, use this new income property to style the color of each polygon on the Leaflet map.
+    * **Result:** A classic color-coded map showing wealth distribution across the county, state, or country.
 
 2. **Counting Farmers' Markets in Neighborhoods:**
     * **Goal:** Create a list or table that shows each neighborhood and the number of farmers' markets located within it.
