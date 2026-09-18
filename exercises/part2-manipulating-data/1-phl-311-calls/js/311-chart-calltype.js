@@ -2,7 +2,7 @@
  * Module for creating and managing the call type bar chart
  */
 
-import { Chart } from "chart.js/auto";
+import { Chart } from 'chart.js/auto';
 
 let callTypeChart = null;
 let currentCallTypeFilter = null;
@@ -42,46 +42,46 @@ function initTypeChart(calls, onFilterChange) {
       datasets: [{
         label: 'Number of Calls',
         data: data,
-        backgroundColor: labels.map(label => 
-          label === currentCallTypeFilter ? '#ff6b6b' : '#4ecdc4'
+        backgroundColor: labels.map((label) =>
+          label === currentCallTypeFilter ? '#ff6b6b' : '#4ecdc4',
         ),
         borderColor: '#2c3e50',
-        borderWidth: 1
-      }]
+        borderWidth: 1,
+      }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
       plugins: {
         legend: {
-          display: false
+          display: false,
         },
         tooltip: {
           callbacks: {
             title: (context) => context[0].label,
-            label: (context) => `${context.parsed.y} calls`
-          }
-        }
+            label: (context) => `${context.parsed.y} calls`,
+          },
+        },
       },
       scales: {
         y: {
           beginAtZero: true,
           ticks: {
-            stepSize: 1
-          }
+            stepSize: 1,
+          },
         },
         x: {
           ticks: {
             maxRotation: 45,
-            minRotation: 45
-          }
-        }
+            minRotation: 45,
+          },
+        },
       },
       onClick: (event, elements) => {
         if (elements.length > 0) {
           const elementIndex = elements[0].index;
           const clickedType = labels[elementIndex];
-          
+
           // Toggle filter
           if (currentCallTypeFilter === clickedType) {
             // Remove filter
@@ -92,12 +92,12 @@ function initTypeChart(calls, onFilterChange) {
             currentCallTypeFilter = clickedType;
             onFilterChange(clickedType, 'calltype');
           }
-          
+
           // Update chart colors
           updateChartColors();
         }
-      }
-    }
+      },
+    },
   });
 }
 
@@ -107,8 +107,8 @@ function initTypeChart(calls, onFilterChange) {
 function updateChartColors() {
   if (callTypeChart) {
     const labels = callTypeChart.data.labels;
-    callTypeChart.data.datasets[0].backgroundColor = labels.map(label => 
-      label === currentCallTypeFilter ? '#ff6b6b' : '#4ecdc4'
+    callTypeChart.data.datasets[0].backgroundColor = labels.map((label) =>
+      label === currentCallTypeFilter ? '#ff6b6b' : '#4ecdc4',
     );
     callTypeChart.update();
   }
@@ -133,5 +133,5 @@ function getCurrentTypeFilter() {
 export {
   initTypeChart,
   clearTypeFilter,
-  getCurrentTypeFilter
+  getCurrentTypeFilter,
 };

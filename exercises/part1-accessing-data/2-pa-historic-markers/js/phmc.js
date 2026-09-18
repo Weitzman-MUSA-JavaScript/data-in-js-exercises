@@ -68,7 +68,7 @@ const historicMarkerCategories = [
   { code: 54, label: 'William Penn' },
   { code: 55, label: 'Women' },
   { code: 56, label: 'Writers' },
-]
+];
 
 /**
  * Populates a given select element with options for each historic marker

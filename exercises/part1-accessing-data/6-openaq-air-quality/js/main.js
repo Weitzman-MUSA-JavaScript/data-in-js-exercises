@@ -1,4 +1,4 @@
-import { showApiKeyDialog, updateApiKeyDisplay, getApiKey } from "./openaq-key.js";
+import { showApiKeyDialog, updateApiKeyDisplay, getApiKey } from './openaq-key.js';
 
 /*
 
@@ -30,6 +30,8 @@ INSTRUCTIONS
 
 */
 
+/* globals bb */
+
 /**
  * Creates a Billboard.js chart for air quality data.
  * @param {string} elementId The DOM ID where the chart will live
@@ -39,20 +41,20 @@ function initChart(elementId) {
   return bb.generate({
     bindto: `#${elementId}`,
     data: {
-      x: "x",
-      columns: []
+      x: 'x',
+      columns: [],
     },
     axis: {
       x: {
-        type: "timeseries",
+        type: 'timeseries',
         tick: {
-          format: "%Y-%m-%d %H:%M"
-        }
+          format: '%Y-%m-%d %H:%M',
+        },
       },
       y: {
-        label: "PM 2.5 (µg/m³)"
-      }
-    }
+        label: 'PM 2.5 (µg/m³)',
+      },
+    },
   });
 }
 
@@ -81,9 +83,9 @@ async function plotAirQualityData(chart) {
  * overlay.
  */
 function indicateStartLoading() {
-  const container = document.querySelector(".visualization-container");
+  const container = document.querySelector('.visualization-container');
   if (container) {
-    container.classList.add("loading");
+    container.classList.add('loading');
   }
 }
 
@@ -92,9 +94,9 @@ function indicateStartLoading() {
  * overlay.
  */
 function indicateEndLoading() {
-  const container = document.querySelector(".visualization-container");
+  const container = document.querySelector('.visualization-container');
   if (container) {
-    container.classList.remove("loading");
+    container.classList.remove('loading');
   }
 }
 
@@ -106,7 +108,7 @@ if (!getApiKey()) {
 updateApiKeyDisplay();
 
 // Set up the chart and it's data
-window.aqChart = initChart("aqi-chart");
+window.aqChart = initChart('aqi-chart');
 try {
   indicateStartLoading();
   await plotAirQualityData(window.aqChart);

@@ -15,6 +15,7 @@ INSTRUCTIONS
 
 */
 
+/* globals L */
 
 /**
  * Creates a polling places Leaflet map object.
@@ -24,14 +25,14 @@ INSTRUCTIONS
 function initPollingPlaceMap(elementOrId) {
   const map = L.map(elementOrId).setView([39.9526, -75.1652], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 
   return map;
 }
 
 /**
- * Fetches the polling place data from OpenDataPhilly AND 
+ * Fetches the polling place data from OpenDataPhilly AND
  * AGGREGATES IT BASED ON UNIQUE STREET ADDRESSES.
  * @returns {Promise<GeoJSON.FeatureCollection>} The deduplicated polling place data.
  */
@@ -66,7 +67,7 @@ async function initPollingPlaceLayer(map) {
     },
     onEachFeature: function (feature, layer) {
       layer.bindPopup(`...`);
-    }
+    },
   }).addTo(map);
 
   return layer;
@@ -74,4 +75,3 @@ async function initPollingPlaceLayer(map) {
 
 window.pollingPlaceMap = initPollingPlaceMap('map');
 window.pollingPlaceLayer = await initPollingPlaceLayer(window.pollingPlaceMap);
-

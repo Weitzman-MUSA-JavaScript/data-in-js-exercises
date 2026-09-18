@@ -14,8 +14,10 @@ INSTRUCTIONS
 
 */
 
-import { populateCategorySelect } from "./phmc.js";
-import { showCorsProxyKeyDialog, updateCorsProxyKeyDisplay, getCorsProxyKey } from "./corsproxy.js";
+/* globals L */
+
+import { populateCategorySelect } from './phmc.js';
+import { showCorsProxyKeyDialog, updateCorsProxyKeyDisplay, getCorsProxyKey } from './corsproxy.js';
 
 /**
  * Creates a historic markers Leaflet map object.
@@ -25,7 +27,7 @@ import { showCorsProxyKeyDialog, updateCorsProxyKeyDisplay, getCorsProxyKey } fr
 function initHistoricMarkerMap(elementOrId) {
   const map = L.map(elementOrId).setView([39.9526, -75.1652], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 
   const layer = L.layerGroup().addTo(map);
@@ -40,8 +42,8 @@ function initHistoricMarkerMap(elementOrId) {
  * @returns {Promise<Array<Object>>} The historic marker data.
  */
 async function getHistoricMarkerData(corsproxykey, keyword, categories) {
-  const philadelphiaCountyCode = 101;  // FIPS code for Philadelphia County
-  const philadelphiaMunicipalityCode = 1711;  // Code for Philadelphia city
+  const philadelphiaCountyCode = 101; // FIPS code for Philadelphia County
+  const philadelphiaMunicipalityCode = 1711; // Code for Philadelphia city
 
   // Marker data URLs look like:
   // `https://corsproxy.io/?key=${corsproxykey}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=...&countyCode=...&municipalities=...&markerCategories=...&markerMissing=`

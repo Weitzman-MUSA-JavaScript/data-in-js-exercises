@@ -42,19 +42,19 @@ This exercise demonstrates:
 
 */
 
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import { htmlToElement } from "./html-utils.js";
+import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+import { htmlToElement } from './html-utils.js';
 
 // API endpoint for Philadelphia 311 calls
 // This URL gets the 100 most recent calls in CSV format
-const API_URL =
-  "https://phl.carto.com/api/v2/sql?filename=public_cases_fc&format=csv&skipfields=cartodb_id,the_geom,the_geom_webmercator&q=SELECT * FROM public_cases_fc ORDER BY requested_datetime DESC LIMIT 100";
+const API_URL
+  = 'https://phl.carto.com/api/v2/sql?filename=public_cases_fc&format=csv&skipfields=cartodb_id,the_geom,the_geom_webmercator&q=SELECT * FROM public_cases_fc ORDER BY requested_datetime DESC LIMIT 100';
 
 // Get references to DOM elements
-const loadingElement = document.getElementById("loading");
-const dataInfoElement = document.getElementById("data-info");
-const callCountElement = document.getElementById("call-count");
-const callsListElement = document.getElementById("calls-list");
+const loadingElement = document.getElementById('loading');
+const dataInfoElement = document.getElementById('data-info');
+const callCountElement = document.getElementById('call-count');
+const callsListElement = document.getElementById('calls-list');
 
 /**
  * Fetch and parse the CSV data from the API using D3
@@ -72,14 +72,14 @@ async function fetchCallsData() {
 function formatDate(dateString) {
   try {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
-  } catch (error) {
+  } catch {
     return dateString; // Return original if parsing fails
   }
 }
@@ -91,10 +91,10 @@ function formatDate(dateString) {
  */
 function getStatusClass(status) {
   const statusLower = status.toLowerCase();
-  if (statusLower.includes("open")) return "status-open";
-  if (statusLower.includes("closed")) return "status-closed";
-  if (statusLower.includes("progress")) return "status-in-progress";
-  return "status-open"; // default
+  if (statusLower.includes('open')) return 'status-open';
+  if (statusLower.includes('closed')) return 'status-closed';
+  if (statusLower.includes('progress')) return 'status-in-progress';
+  return 'status-open'; // default
 }
 
 /**
@@ -112,7 +112,7 @@ function createCallListItem(call) {
  */
 function displayCalls(calls) {
   // Clear the existing list
-  callsListElement.innerHTML = "";
+  callsListElement.innerHTML = '';
 
   // Update the count
   callCountElement.textContent = calls.length;
@@ -133,16 +133,16 @@ function displayCalls(calls) {
  */
 async function load311CallsData() {
   try {
-    console.log("Fetching 311 calls data with D3...");
+    console.log('Fetching 311 calls data with D3...');
     const calls = await fetchCallsData();
     displayCalls(calls);
   } catch (error) {
-    console.error("Error loading 311 calls data:", error);
+    console.error('Error loading 311 calls data:', error);
 
     // Show error message to user
-    alert("Error loading data. Please try again later.");
+    alert('Error loading data. Please try again later.');
   }
 }
 
 // Load the data when the page loads
-document.addEventListener("DOMContentLoaded", load311CallsData);
+document.addEventListener('DOMContentLoaded', load311CallsData);

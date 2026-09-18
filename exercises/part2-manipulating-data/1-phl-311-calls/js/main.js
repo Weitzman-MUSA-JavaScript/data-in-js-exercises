@@ -15,7 +15,7 @@ Your task is to implement the key data manipulation functions:
     copy the following functions from main.js into the js/311-list-calls.js module
     (replacing the existing sample solution code):
     - createCallListItem
-    - formatDate  
+    - formatDate
     - getStatusClass
     These functions are already imported and used by the dashboard.
 
@@ -27,12 +27,12 @@ Your task is to implement the key data manipulation functions:
     of calls based on the current filter state. Use Array.prototype.filter() to
     return only calls that match the active filters (service type and/or status).
 
-3.  In the 311-chart-calltype.js module, implement the aggregateCallsByType 
-    function using Array.prototype.reduce() to count the number of calls for 
+3.  In the 311-chart-calltype.js module, implement the aggregateCallsByType
+    function using Array.prototype.reduce() to count the number of calls for
     each service type.
 
-4.  In the 311-chart-status.js module, implement the aggregateCallsByStatus 
-    function using Array.prototype.reduce() to count the number of calls for 
+4.  In the 311-chart-status.js module, implement the aggregateCallsByStatus
+    function using Array.prototype.reduce() to count the number of calls for
     each status.
 
 The interactive charts and cross-filtering logic are already implemented. Once you
@@ -43,10 +43,10 @@ complete these functions, you'll have a fully working dashboard where:
 
 */
 
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import { displayCalls } from "./311-list-calls.js";
-import { initTypeChart, clearTypeFilter, getCurrentTypeFilter } from "./311-chart-calltype.js";
-import { initStatusChart, clearStatusFilter, getCurrentStatusFilter } from "./311-chart-status.js";
+import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+import { displayCalls } from './311-list-calls.js';
+import { initTypeChart, clearTypeFilter, getCurrentTypeFilter } from './311-chart-calltype.js';
+import { initStatusChart, clearStatusFilter, getCurrentStatusFilter } from './311-chart-status.js';
 
 // Global state
 let allCalls = [];
@@ -69,7 +69,7 @@ async function fetchCallsData(callsToFetch = 200, callsToSkip = 0) {
     + `q=SELECT * FROM public_cases_fc `
     + `ORDER BY requested_datetime DESC `
     + `LIMIT ${callsToFetch} OFFSET ${callsToSkip}`;
-  
+
   // In this exercise, we want to be able to load more data on demand, so we
   // parameterize the number of 311 calls to fetch and skip. That way, we can
   // fetch the first 200 calls, then the next 200, and so on.
@@ -87,7 +87,6 @@ function filterCalls(calls) {
   const statusFilter = getCurrentStatusFilter();
 
   // ... Your code here ...
-
 }
 
 /**
@@ -96,12 +95,12 @@ function filterCalls(calls) {
 function updateFilterInfo() {
   const typeFilter = getCurrentTypeFilter();
   const statusFilter = getCurrentStatusFilter();
-  
+
   if (typeFilter || statusFilter) {
     let description = [];
     if (typeFilter) description.push(`Service Type: ${typeFilter}`);
     if (statusFilter) description.push(`Status: ${statusFilter}`);
-    
+
     filterDescriptionElement.textContent = description.join(', ');
     filterInfoElement.classList.remove('hidden');
   } else {
@@ -116,14 +115,14 @@ function updateFilterInfo() {
  */
 function handleFilterChange(filterValue, filterType) {
   console.log(`Filter changed: ${filterType} = ${filterValue}`);
-  
+
   // Update filtered data
   filteredCalls = filterCalls(allCalls);
-  
+
   // Update displays
   displayCalls(filteredCalls);
   updateFilterInfo();
-  
+
   // Update both charts with filtered data
   // This allows for cross-filtering between charts
   initTypeChart(filteredCalls, handleFilterChange);
@@ -136,11 +135,11 @@ function handleFilterChange(filterValue, filterType) {
 function clearAllFilters() {
   clearTypeFilter();
   clearStatusFilter();
-  
+
   filteredCalls = allCalls;
   displayCalls(filteredCalls);
   updateFilterInfo();
-  
+
   // Reinitialize charts with all data
   initTypeChart(filteredCalls, handleFilterChange);
   initStatusChart(filteredCalls, handleFilterChange);
@@ -153,13 +152,13 @@ function clearAllFilters() {
 function initializeDashboard(calls) {
   allCalls = calls;
   filteredCalls = calls;
-  
+
   // Initialize all components
   displayCalls(filteredCalls);
   initTypeChart(filteredCalls, handleFilterChange);
   initStatusChart(filteredCalls, handleFilterChange);
   updateFilterInfo();
-  
+
   // Add clear filter button event listener
   clearFilterButton.addEventListener('click', clearAllFilters);
 }
@@ -169,18 +168,18 @@ function initializeDashboard(calls) {
  */
 async function load311CallsData() {
   try {
-    console.log("Fetching 311 calls data with D3...");
+    console.log('Fetching 311 calls data with D3...');
     const calls = await fetchCallsData();
     console.log(`Loaded ${calls.length} calls`);
-    
+
     initializeDashboard(calls);
   } catch (error) {
-    console.error("Error loading 311 calls data:", error);
+    console.error('Error loading 311 calls data:', error);
 
     // Show error message to user
-    alert("Error loading data. Please try again later.");
+    alert('Error loading data. Please try again later.');
   }
 }
 
 // Load the data when the page loads
-document.addEventListener("DOMContentLoaded", load311CallsData);
+document.addEventListener('DOMContentLoaded', load311CallsData);

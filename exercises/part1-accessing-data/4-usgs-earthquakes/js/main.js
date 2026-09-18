@@ -3,22 +3,23 @@
 INSTRUCTIONS
 ============
 
-1.  Update the getEarthquakeData function to fetch the GeoJSON feed for all 
+1.  Update the getEarthquakeData function to fetch the GeoJSON feed for all
     earthquakes in the past week from the USGS. The data is available at:
     https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson
 
-2.  Update the initEarthquakeLayer function to display each earthquake as a 
-    circle marker on the map. Use the earthquake's magnitude 
+2.  Update the initEarthquakeLayer function to display each earthquake as a
+    circle marker on the map. Use the earthquake's magnitude
     (feature.properties.mag) to determine the radius of the circle marker.
 
-3.  Add a popup to each circle marker that displays the earthquake's title 
+3.  Add a popup to each circle marker that displays the earthquake's title
     (feature.properties.title).
 
-4.  Optional: Style the circle markers with different colors based on 
+4.  Optional: Style the circle markers with different colors based on
     earthquake depth or age.
 
 */
 
+/* globals L */
 
 /**
  * Creates an earthquake map Leaflet map object centered on the world.
@@ -28,7 +29,7 @@ INSTRUCTIONS
 function initEarthquakeMap(elementOrId) {
   const map = L.map(elementOrId).setView([20, 0], 2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   }).addTo(map);
 
   return map;
@@ -50,8 +51,8 @@ async function getEarthquakeData() {
 function getRadiusFromMagnitude(magnitude) {
   // Scale magnitude to reasonable pixel radius
   // Magnitude typically ranges from 0-10; re-scale to 2-50 pixels
-  
-  return // ... Your code here ...;
+
+  return; // ... Your code here ...;
 }
 
 /**
@@ -61,7 +62,7 @@ function getRadiusFromMagnitude(magnitude) {
  */
 function getColorFromDepth(depth) {
   // Shallow earthquakes (< 70km) are red
-  // Intermediate earthquakes (70-300km) are orange  
+  // Intermediate earthquakes (70-300km) are orange
   // Deep earthquakes (> 300km) are yellow
   if (depth < 70) return '#ff4444';
   if (depth < 300) return '#ff8844';
@@ -83,7 +84,7 @@ async function initEarthquakeLayer(map) {
     },
     onEachFeature: (feature, layer) => {
       // layer.bindPopup(`... Your code here ...`);
-    }
+    },
   }).addTo(map);
 
   return layer;

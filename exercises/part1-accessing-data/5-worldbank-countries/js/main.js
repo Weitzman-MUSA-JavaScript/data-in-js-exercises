@@ -3,17 +3,17 @@
 INSTRUCTIONS
 ============
 
-1.  Update the getCountriesData function to fetch country data from the World 
+1.  Update the getCountriesData function to fetch country data from the World
     Bank API. Use the base URL: http://api.worldbank.org/v2/country?format=json
     For a specific region, use: http://api.worldbank.org/v2/region/{REGION_CODE}/country?format=json
     where {REGION_CODE} is one of: EAS, ECS, LCN, MEA, NAC, SAS, SSF
 
-2.  The World Bank API returns paginated results. The first element of the 
+2.  The World Bank API returns paginated results. The first element of the
     response contains metadata including pagination info (page, per_page, total).
-    The second element contains the actual data array. You'll need to access 
+    The second element contains the actual data array. You'll need to access
     both parts of the response.
 
-3.  Add pagination support by including a ?page= query parameter to load 
+3.  Add pagination support by including a ?page= query parameter to load
     additional pages of results.
 
 4.  Optional: Add error handling for API failures and loading states.
@@ -111,19 +111,19 @@ function createCountryListItem(country) {
  */
 function displayCountries(countries, append = false) {
   // Filter out non-country entities (like regions, aggregates)
-  const actualCountries = countries.filter(country => 
-    country.region && 
-    country.region.id !== 'NA' && 
-    country.incomeLevel && 
-    country.incomeLevel.id !== 'NA'
+  const actualCountries = countries.filter((country) =>
+    country.region
+    && country.region.id !== 'NA'
+    && country.incomeLevel
+    && country.incomeLevel.id !== 'NA',
   );
-  
+
   // Clear the existing list if not appending
   if (!append) {
     countriesListElement.innerHTML = '';
     shownCountries = 0;
   }
-  
+
   // Create and append list items for each country
   for (const country of actualCountries) {
     const listItem = createCountryListItem(country);
@@ -181,7 +181,7 @@ function showError() {
 async function loadCountries(isNewRegion = true) {
   try {
     const selectedRegion = regionSelect.value;
-    
+
     // Reset pagination state for new region
     if (isNewRegion) {
       currentPage = 0;
@@ -196,17 +196,16 @@ async function loadCountries(isNewRegion = true) {
       showLoading(false);
       console.log(`Loading page ${currentPage} for region:`, currentRegion || 'All Regions');
     }
-    
+
     const result = await getCountriesData(currentRegion, currentPage + 1);
-    
+
     // Update pagination state
     currentPage = result.page;
     totalPages = result.totalPages;
-    
+
     // Display countries (append if loading more pages)
     displayCountries(result.countries, !isNewRegion);
     hideLoading();
-    
   } catch (error) {
     console.error('Error loading countries:', error);
     showError();
@@ -225,11 +224,11 @@ async function loadMoreCountries() {
  */
 function handleScroll() {
   const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-  
+
   // Check if user is near bottom (within 100px) and there are more pages
-  if (scrollTop + clientHeight >= scrollHeight - 100 && 
-      currentPage < totalPages && 
-      !isLoading) {
+  if (scrollTop + clientHeight >= scrollHeight - 100
+    && currentPage < totalPages
+    && !isLoading) {
     loadMoreCountries();
   }
 }

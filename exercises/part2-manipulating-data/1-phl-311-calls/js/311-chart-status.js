@@ -2,7 +2,7 @@
  * Module for creating and managing the status pie chart
  */
 
-import { Chart } from "chart.js/auto";
+import { Chart } from 'chart.js/auto';
 
 let statusChart = null;
 let currentStatusFilter = null;
@@ -32,16 +32,16 @@ function initStatusChart(calls, onFilterChange) {
   // Define colors for each status
   const baseColors = {
     'Open': '#dc3545',
-    'Closed': '#28a745', 
+    'Closed': '#28a745',
     'In Progress': '#ffc107',
     'Assigned': '#17a2b8',
-    'Unknown': '#6c757d'
+    'Unknown': '#6c757d',
   };
 
   // Generate colors array
-  const colors = labels.map(label => baseColors[label] || '#6c757d');
-  const highlightColors = labels.map(label => 
-    label === currentStatusFilter ? '#ff6b6b' : (baseColors[label] || '#6c757d')
+  const colors = labels.map((label) => baseColors[label] || '#6c757d');
+  const highlightColors = labels.map((label) =>
+    label === currentStatusFilter ? '#ff6b6b' : (baseColors[label] || '#6c757d'),
   );
 
   // Destroy existing chart if it exists
@@ -58,8 +58,8 @@ function initStatusChart(calls, onFilterChange) {
         data: data,
         backgroundColor: highlightColors,
         borderColor: '#fff',
-        borderWidth: 2
-      }]
+        borderWidth: 2,
+      }],
     },
     options: {
       responsive: true,
@@ -69,8 +69,8 @@ function initStatusChart(calls, onFilterChange) {
           position: 'bottom',
           labels: {
             padding: 20,
-            usePointStyle: true
-          }
+            usePointStyle: true,
+          },
         },
         tooltip: {
           callbacks: {
@@ -78,15 +78,15 @@ function initStatusChart(calls, onFilterChange) {
               const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
               const percentage = ((context.parsed / total) * 100).toFixed(1);
               return `${context.label}: ${context.parsed} calls (${percentage}%)`;
-            }
-          }
-        }
+            },
+          },
+        },
       },
       onClick: (event, elements) => {
         if (elements.length > 0) {
           const elementIndex = elements[0].index;
           const clickedStatus = labels[elementIndex];
-          
+
           // Toggle filter
           if (currentStatusFilter === clickedStatus) {
             // Remove filter
@@ -97,12 +97,12 @@ function initStatusChart(calls, onFilterChange) {
             currentStatusFilter = clickedStatus;
             onFilterChange(clickedStatus, 'status');
           }
-          
+
           // Update chart colors
           updateChartColors();
         }
-      }
-    }
+      },
+    },
   });
 }
 
@@ -114,14 +114,14 @@ function updateChartColors() {
     const labels = statusChart.data.labels;
     const baseColors = {
       'Open': '#dc3545',
-      'Closed': '#28a745', 
+      'Closed': '#28a745',
       'In Progress': '#ffc107',
       'Assigned': '#17a2b8',
-      'Unknown': '#6c757d'
+      'Unknown': '#6c757d',
     };
 
-    statusChart.data.datasets[0].backgroundColor = labels.map(label => 
-      label === currentStatusFilter ? '#ff6b6b' : (baseColors[label] || '#6c757d')
+    statusChart.data.datasets[0].backgroundColor = labels.map((label) =>
+      label === currentStatusFilter ? '#ff6b6b' : (baseColors[label] || '#6c757d'),
     );
     statusChart.update();
   }
@@ -146,5 +146,5 @@ function getCurrentStatusFilter() {
 export {
   initStatusChart,
   clearStatusFilter,
-  getCurrentStatusFilter
+  getCurrentStatusFilter,
 };
