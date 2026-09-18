@@ -37,12 +37,30 @@
       </form>
     </div>
     <div id="map" class="map visualization-container"></div>
+
     <dialog id="loading-dialog">
       <p class="loading-spinner">Loading historic markers...</p>
+    </dialog>
+
+    <dialog id="corsproxykey-dialog">
+      <form id="corsproxykey-form" method="dialog">
+        <h2>Enter CORS Proxy Key</h2>
+        <p>For this exercise you'll use a service called <a href="https://corsproxy.io/" target="_blank" rel="noopener">CORS Proxy</a> to avoid cross-origin resource sharing (CORS) issues. You will need to sign up for a <em>free</em> account on CORS Proxy to obtain an API key. You will also need to ensure that your CORS Proxy account is configured in <strong>Monitoring only</strong> mode:</p>
+        <ol>
+          <li>Sign up for a free account on <a href="https://corsproxy.io/" target="_blank" rel="noopener">CORS Proxy</a>.</li>
+          <li>On the dashboard, click the <strong>Add domain</strong> button.</li>
+          <li>In the <strong>Origin enforcement</strong> section, switch the enforcement mode from <strong>Blocked</strong> to <strong>Monitoring</strong>.</li>
+        </ol>
+        <p>Once you have that key, enter it in the form below.</p>
+        <label for="corsproxykey-input">CORS Proxy Key:</label>
+        <input type="text" id="corsproxykey-input" name="corsproxykey" required>
+        <button type="submit">Save</button>
+      </form>
     </dialog>
   </main>
   <footer>
     <p>Data from the <a href="https://share.phmc.pa.gov/server/api/search/phmcmarkers" target="_blank" rel="noopener">Pennsylvania Historical and Museum Commission</a>.</p>
+    <p>CORS Proxy Key is: <code id="corsproxykey-display"></code>. <button id="show-corsproxykey-dialog-button" type="button">Reset CORS Proxy Key</button></p>
   </footer>
 </body>
 

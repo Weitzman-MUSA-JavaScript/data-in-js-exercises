@@ -15,6 +15,7 @@ INSTRUCTIONS
 */
 
 import { populateCategorySelect } from "./phmc.js";
+import { showCorsProxyKeyDialog, updateCorsProxyKeyDisplay, getCorsProxyKey } from "./corsproxy.js";
 
 /**
  * Creates a historic markers Leaflet map object.
@@ -38,12 +39,12 @@ function initHistoricMarkerMap(elementOrId) {
  * @param {Array<number>} categories An array of category IDs to filter the markers.
  * @returns {Promise<Array<Object>>} The historic marker data.
  */
-async function getHistoricMarkerData(keyword, categories) {
+async function getHistoricMarkerData(corsproxykey, keyword, categories) {
   const philadelphiaCountyCode = 101;  // FIPS code for Philadelphia County
   const philadelphiaMunicipalityCode = 1711;  // Code for Philadelphia city
 
   // Marker data URLs look like:
-  // https://corsproxy.io/?url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=...&countyCode=...&municipalities=...&markerCategories=...&markerMissing=
+  // `https://corsproxy.io/?key=${corsproxykey}&url=https://share.phmc.pa.gov/server/api/search/phmcmarkers?keyword=...&countyCode=...&municipalities=...&markerCategories=...&markerMissing=`
   //
   // Two important notes:
   // 1. We use a CORS Proxy (https://corsproxy.io/) to avoid cross-origin
@@ -62,7 +63,7 @@ async function getHistoricMarkerData(keyword, categories) {
  * @param {Array<number>} categories Any marker category IDs, if provided
  */
 async function updateHistoricMarkerLayer(layer, keyword, categories) {
-  const historicMarkers = await getHistoricMarkerData(keyword, categories);
+  const historicMarkers = await getHistoricMarkerData(getCorsProxyKey(), keyword, categories);
 
   // ... Your code here ...
 }
@@ -81,6 +82,11 @@ function onHistoricMarkerFormSubmit(evt, layer) {
 
   updateHistoricMarkerLayer(layer, keyword, categories);
 }
+
+if (!getCorsProxyKey()) {
+  showCorsProxyKeyDialog();
+}
+updateCorsProxyKeyDisplay();
 
 const phmcCategorySelect = document.getElementById('phmc-categories');
 populateCategorySelect(phmcCategorySelect);
