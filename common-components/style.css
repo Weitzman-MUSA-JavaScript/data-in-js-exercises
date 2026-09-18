@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Gilda+Display&family=Courier+Prime&family=Roboto:wght@400;700&display=swap');
+
+:root {
+  --font-serif: 'Gilda Display', serif;
+  --font-mono: 'Courier Prime', monospace;
+  --font-sans: 'Roboto', sans-serif;
+  --color-primary: #011f5b;
+  --color-secondary: #990000;
+  --color-background: #f5f4f0;
+  --color-background-header: #ffffff;
+  --color-background-input: #ffffff;
+  --color-background-dark: #000000;
+  --color-text: #000000;
+  --color-text-light: var(--color-background);
+}
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+header, main, footer {
+  padding: 1rem;
+  margin: 0;
+}
+
+header {
+  border-bottom: 0.25rem solid var(--color-primary);
+  background-color: var(--color-background-header);
+  padding-bottom: 0.5rem;
+}
+
+header h1 {
+  margin: 0 0 0.5rem 0;
+}
+
+header p {
+  margin: 0 0 0.5rem 0;
+  color: var(--color-text);
+}
+
+footer {
+  background-color: var(--color-background-dark);
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+}
+
+footer a {
+  color: var(--color-text-light);
+}
+
+footer p {
+  margin: 0;
+}
+
+h1 {
+  font-family: var(--font-serif);
+}
+
+h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: bold;
+}
+
+nav, button, input, select, label {
+  font-family: var(--font-mono);
+}
+
+a:focus, button:focus, input:focus, select:focus, label:focus {
+  outline: var(--color-primary) solid 2px;
+}
+
+nav {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+  padding: 0.5rem 1rem;
+}
+
+header nav {
+  margin: 0 -1rem;
+  padding-bottom: 0.25rem;
+}
+
+nav a {
+  color: var(--color-text-light);
+  text-decoration: none;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  padding: 0;
+  margin: 0;
+}
+
+nav ul li {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+nav ul li:not(:last-child)::after {
+  content: "|";
+  margin-left: 0.5rem;
+}
+
+button {
+  background-color: var(--color-secondary);
+  color: var(--color-text-light);
+  border: 1px solid var(--color-secondary);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+button:hover {
+  background-color: var(--color-background);
+  color: var(--color-secondary);
+}
+
+button:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  border-color: #cccccc;
+  cursor: not-allowed;
+}
+
+button .disabled-label {
+  display: none;
+}
+
+button:disabled .enabled-label {
+  display: none;
+}
+
+button:disabled .disabled-label {
+  display: inline;
+}
+
+input {
+  background-color: var(--color-background-input);
+  border: 1px solid var(--color-secondary);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+}
+
+select {
+  background-color: var(--color-background-input);
+  border: 1px solid var(--color-secondary);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+}
+
+dialog {
+  border: 1px solid var(--color-secondary);
+  border-radius: 0.25rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-family: var(--font-sans);
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Loading States */
+.relative-container {
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(245, 244, 240, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-spinner {
+  font-family: var(--font-mono);
+  font-weight: bold;
+  color: var(--color-primary);
+  background-color: var(--color-background-header);
+  border: 1px solid var(--color-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(1, 31, 91, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-secondary);
+  animation: indeterminate-progress 1.5s infinite ease-in-out;
+}
+
+@keyframes indeterminate-progress {
+  0% {
+    left: 0%;
+    width: 0%;
+  }
+  50% {
+    left: 25%;
+    width: 50%;
+  }
+  100% {
+    left: 100%;
+    width: 0%;
+  }
+}

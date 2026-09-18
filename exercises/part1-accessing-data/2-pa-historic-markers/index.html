@@ -11,6 +11,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <link rel="icon" type="image/x-png" href="img/favicon.png">
+  <link rel="stylesheet" href="../../../common-components/style.css">
   <link rel="stylesheet" href="css/styles.css">
   <script type="module" src="js/main.js"></script>
 </head>
@@ -18,23 +19,31 @@
 <body>
   <header>
     <h1>Pennsylvania Historic Markers</h1>
-    <p class="info"></p>
+    <p class="info">Explore historical markers across Philadelphia</p>
   </header>
   <main>
-    <form id="phmc-filters">
-      <label for="phmc-keyword">Keyword:</label>
-      <input type="text" id="phmc-keyword" name="phmc-keyword">
+    <div class="sidebar-container">
+      <form id="phmc-filters">
+        <label for="phmc-keyword">Keyword:</label>
+        <input type="text" id="phmc-keyword" name="phmc-keyword">
 
-      <label for="phmc-categories">Categories:</label>
-      <select id="phmc-categories" name="phmc-categories" multiple></select>
+        <label for="phmc-categories">Categories:</label>
+        <select id="phmc-categories" name="phmc-categories" multiple></select>
 
-      <button type="submit">Search</button>
-    </form>
-    <div id="map" class="map"></div>
+        <button type="submit">
+          <span class="enabled-label">Search</span>
+          <span class="disabled-label">Searching...</span>
+        </button>
+      </form>
+    </div>
+    <div id="map" class="map visualization-container"></div>
     <dialog id="loading-dialog">
-      <p>Loading historic markers...</p>
+      <p class="loading-spinner">Loading historic markers...</p>
     </dialog>
   </main>
+  <footer>
+    <p>Data from the <a href="https://share.phmc.pa.gov/server/api/search/phmcmarkers" target="_blank" rel="noopener">Pennsylvania Historical and Museum Commission</a>.</p>
+  </footer>
 </body>
 
 </html>

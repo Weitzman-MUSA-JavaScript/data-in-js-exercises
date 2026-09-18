@@ -1,30 +1,75 @@
 body {
-  display: flex;
-  flex-direction: column;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-}
-
-header {
-  padding: 0.5rem
 }
 
 main {
   display: flex;
-  height: 100%;
+  flex-direction: row;
+  flex-grow: 1;
+  gap: 1rem;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.sidebar-container {
+  width: 15rem;
+  overflow-y: auto;
 }
 
 form {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  padding: 0.5rem;
-  width: 250px;
 }
 
-.map {
+#phmc-categories {
+  min-height: 8rem;
+}
+
+.visualization-container {
+  flex-grow: 1;
   height: 100%;
-  width: 100%;
-  background-color: #eee;
+}
+
+#loading-dialog {
+  border: 1px solid var(--color-primary);
+  border-radius: 0.25rem;
+  background-color: var(--color-background-header);
+  color: var(--color-primary);
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+#loading-dialog::backdrop {
+  background-color: rgba(245, 244, 240, 0.85);
+}
+
+#loading-dialog p {
+  margin: 0;
+}
+
+@media (width <= 30rem) {
+  body {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  main {
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .sidebar-container {
+    width: 100%;
+  }
+
+  .visualization-container {
+    min-height: 50vh;
+    height: 50vh;
+  }
 }
