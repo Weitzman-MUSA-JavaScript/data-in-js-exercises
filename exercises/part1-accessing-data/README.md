@@ -4,6 +4,9 @@
 
 Work with local and global datasets that are immediately visual and cover different parts of the world. This part focuses on the fundamentals: fetching data from a URL and getting it onto the screen. The manipulations are minimal, focusing on loops and basic property access.
 
+> **Note on API Keys**: Some of these exercises require API keys. When they do, there will be places in the interface for you to enter your API keys. You should generally avoid checking these keys into git unless they are explicitly called out as public keys.
+
+
 ### **Local Data Sources**
 
 * **Philadelphia Polling Places ([GeoJSON](https://opendataphilly.org/datasets/polling-places/)):** Locations of polling places in the city.
@@ -56,6 +59,6 @@ Work with local and global datasets that are immediately visual and cover differ
     * **Result:** A simple webpage listing the countries of a selected world region.
 
 6. **Chart of Air Quality in a Major City:**
-    * **Goal:** Pick a major world city (e.g., Delhi, São Paulo, Lagos). Use the OpenAQ API to get the latest 100 PM2.5 measurements and display them on a time-series line chart.
-    * **Skills:** `fetch` from an API that requires query parameters (e.g., `?city=Delhi&parameter=pm25`). Process the resulting JSON to create two arrays: one for timestamps (labels) and one for values (data). Pass these arrays to Chart.js to create a line chart.
-    * **Result:** A line chart showing recent air pollution trends in a specific city.
+    * **Goal:** Pick a major world location (e.g., Delhi, São Paulo, Lagos). Use the OpenAQ V3 API (which requires an API key passed via the `X-API-Key` header) to get the latest PM2.5 measurements and display them on a time-series line chart.
+    * **Skills:** Pass custom authentication headers in `fetch` (`X-API-Key`). Process the resulting JSON to format two arrays/columns for Billboard.js: one for timestamps (e.g., `["x", ...]`) and one for values (e.g., `["pm25", ...]`). Use Billboard.js to render a timeseries line chart.
+    * **Result:** A time-series line chart showing recent air pollution trends in a specific city rendered with Billboard.js.

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality in a Major City</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.pkgd.min.js"></script>
+
+    <link rel="stylesheet" href="../../../common-components/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Air Quality in a Major City</h1>
+        <p class="info">Visualizing PM2.5 measurements over time</p>
+    </header>
+    <main>
+        <div class="visualization-container">
+            <div id="aqi-chart" class="chart"></div>
+            <div class="loading-overlay">
+                <div class="loading-spinner">
+                    Loading data...
+                    <div class="progress-bar-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <dialog id="openaqkey-dialog">
+            <form id="openaqkey-form" method="dialog">
+                <h2>Enter OpenAQ API Key</h2>
+                <p>For this exercise you will use the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ API</a> (Version 3) to fetch air quality data. You will need to sign up for a free account on OpenAQ to generate an API key.</p>
+                <p>Once you have your key, enter it in the form below.</p>
+                <label for="openaqkey-input">OpenAQ API Key:</label>
+                <input type="text" id="openaqkey-input" name="openaqkey" required>
+                <button type="submit">Save</button>
+            </form>
+        </dialog>
+    </main>
+    <footer>
+        <p>Data from the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ Platform</a>.</p>
+        <p>OpenAQ API Key is: <code id="openaqkey-display"></code>. <button id="show-openaqkey-dialog-button" type="button">Update API Key</button></p>
+    </footer>
+</body>
+</html>
