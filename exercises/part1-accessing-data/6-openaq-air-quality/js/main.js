@@ -42,6 +42,30 @@ INSTRUCTIONS
 /* globals bb */
 
 /**
+ * Offsets a given date by a specified number of days..
+ * @param {Date} dt The original date.
+ * @param {number} days The number of days to offset. Positive moves forward, negative moves backward.
+ * @returns {Date} The new date after applying the offset.
+ */
+function offsetDays(dt, days) {
+  const copyDT = new Date(dt);
+  copyDT.setDate(copyDT.getDate() + days);
+  return copyDT;
+}
+
+/**
+ * Checks if a given date is between two other dates.
+ * @param {Date} dt  The date to check.
+ * @param {Date} early The start of the date range.
+ * @param {Date} late The end of the date range.
+ * @returns {boolean} True if the date is between early and late, false otherwise.
+ */
+function isBetween(dt, early, late) {
+  const copyDT = new Date(dt);
+  return copyDT >= early && copyDT < late;
+}
+
+/**
  * Creates a Billboard.js chart for air quality data.
  * @param {string} elementId The DOM ID where the chart will live
  * @returns {object} The Billboard chart instance
@@ -75,6 +99,25 @@ function initChart(elementId) {
  */
 async function getAirQualityData(corsproxykey, apiKey) {
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  const sensorId = 246; // London - Westminster Marylebone Road (PM2.5 sensor)
+  const dateFrom = offsetDays(new Date(), -180);
+  const targetUrl = `https://api.openaq.org/v3/sensors/${sensorId}/measurements/daily?datetime_from=${dateFrom.toISOString()}&limit=100`;
+  const url = `https://corsproxy.io/?key=${corsproxykey}&url=${encodeURIComponent(targetUrl)}`;
+  const response = await fetch(url, {
+    headers: {
+      'X-API-Key': apiKey,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenAQ API Error: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -87,6 +130,61 @@ async function plotAirQualityData(chart) {
   const aqData = await getAirQualityData(corsproxykey, apiKey);
 
   // ... Your code here ...
+
+  // === BEGIN SAMPLE SOLUTION ===
+  // Measurements in OpenAQ V3 are newest first; reverse so chart displays chronologically
+  const results = aqData.results ? [...aqData.results].reverse() : [];
+
+  const timestamps = ['x', ...results.map((m) => m.period.datetimeFrom.local)];
+  const pm25Values = ['PM 2.5', ...results.map((m) => m.value)];
+  const pm25RunningAverage = ['PM 2.5 (30-day avg)', ...results.map((refM, _, arr, window = 30) => {
+    const midpoint = new Date(refM.period.datetimeFrom.utc);
+    const earliest = offsetDays(midpoint, -Math.floor(window / 2));
+    const latest = offsetDays(midpoint, Math.ceil(window / 2));
+    const values = arr.filter((m) => isBetween(m.period.datetimeFrom.utc, earliest, latest));
+    const sum = values.reduce((acc, y) => acc + y.value, 0);
+    return sum / values.length;
+  })];
+
+  // Update the chart with the following options:
+  // {
+  //   line: {
+  //     point: ['PM 2.5'],
+  //   },
+  //   axis: {
+  //     x: {
+  //       tick: {
+  //         count: 4,
+  //       },
+  //       forceAsSingle: true,
+  //     },
+  //   },
+  //   tooltip: {
+  //     format: {
+  //       title: (x) => (new Date(x)).toDateString(),
+  //       value: (y) => y.toFixed(2),
+  //     },
+  //   },
+  // }
+  chart.config('line.point', ['PM 2.5']);
+  chart.config('axis.x.tick.count', 4);
+  chart.config('axis.x.forceAsSingle', true);
+  chart.config('tooltip.format.title', (x) => (new Date(x)).toDateString());
+  chart.config('tooltip.format.value', (y) => y.toFixed(2));
+
+  // Load the data into the chart
+  chart.load({
+    columns: [
+      timestamps,
+      pm25Values,
+      pm25RunningAverage,
+    ],
+    types: {
+      'PM 2.5': 'scatter',
+      'PM 2.5 (30-day avg)': 'spline', // for ESM specify as: spline()
+    },
+  });
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
