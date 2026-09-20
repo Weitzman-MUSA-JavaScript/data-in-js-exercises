@@ -33,18 +33,20 @@
 
         <dialog id="openaqkey-dialog">
             <form id="openaqkey-form" method="dialog">
-                <h2>Enter OpenAQ API Key</h2>
+                <h2>Enter API Keys</h2>
                 <p>For this exercise you will use the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ API</a> (Version 3) to fetch air quality data. You will need to sign up for a free account on OpenAQ to generate an API key.</p>
-                <p>Once you have your key, enter it in the form below.</p>
+                <p>Because the OpenAQ API does not support direct browser requests with custom headers, you will also need a free CORS proxy key from <a href="https://corsproxy.io/" target="_blank" rel="noopener">corsproxy.io</a>.</p>
                 <label for="openaqkey-input">OpenAQ API Key:</label>
                 <input type="text" id="openaqkey-input" name="openaqkey" required>
+                <label for="corsproxykey-input">CORS Proxy API Key:</label>
+                <input type="text" id="corsproxykey-input" name="corsproxykey" required>
                 <button type="submit">Save</button>
             </form>
         </dialog>
     </main>
     <footer>
-        <p>Data from the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ Platform</a>.</p>
-        <p>OpenAQ API Key is: <code id="openaqkey-display"></code>. <button id="show-openaqkey-dialog-button" type="button">Update API Key</button></p>
+        <p>Data from the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ Platform</a> via <a href="https://corsproxy.io/" target="_blank" rel="noopener">corsproxy.io</a>.</p>
+        <p>OpenAQ Key: <code id="openaqkey-display"></code> | CORS Proxy Key: <code id="corsproxykey-display"></code> <button id="show-openaqkey-dialog-button" type="button">Update API Keys</button></p>
     </footer>
 </body>
 </html>

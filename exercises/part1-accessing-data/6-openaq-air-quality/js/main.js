@@ -1,4 +1,9 @@
-import { showApiKeyDialog, updateApiKeyDisplay, getApiKey } from './openaq-key.js';
+import {
+  showApiKeyDialog,
+  updateApiKeyDisplay,
+  getApiKey,
+  getCorsProxyKey,
+} from './openaq-key.js';
 
 /*
 
@@ -7,11 +12,15 @@ INSTRUCTIONS
 
 1.  Update the getAirQualityData function to get the latest PM2.5 measurements
     for a location using the OpenAQ API (Version 3) and the `fetch` function.
-    You will need to pass your OpenAQ API key via the `X-API-Key` header:
-      fetch(url, { headers: { 'X-API-Key': apiKey } })
+    Because the OpenAQ API does not allow direct browser requests with custom headers,
+    you will need to route the request through a CORS proxy (corsproxy.io):
+      `https://corsproxy.io/?key=${corsproxykey}&url=${encodeURIComponent(targetUrl)}`
 
-    For example, you can query measurements for a specific location ID:
-      `https://api.openaq.org/v3/locations/${location_id}/measurements?limit=100`
+    And pass your OpenAQ API key via the `X-API-Key` header:
+      fetch(proxyUrl, { headers: { 'X-API-Key': apiKey } })
+
+    For example, you can query measurements for a specific location ID (e.g., Delhi: 6139):
+      `https://api.openaq.org/v3/locations/${location_id}/measurements?parameters_id=2&limit=100`
 
 2.  Update the plotAirQualityData function to process the fetched measurements into
     two column arrays for Billboard.js:
@@ -59,11 +68,12 @@ function initChart(elementId) {
 }
 
 /**
- * Fetches air quality measurements from the OpenAQ API.
+ * Fetches air quality measurements from the OpenAQ API via the CORS proxy.
+ * @param {string} corsproxykey The corsproxy.io API key
  * @param {string} apiKey The OpenAQ API key
  * @returns {Promise<object>} The air quality data
  */
-async function getAirQualityData(apiKey) {
+async function getAirQualityData(corsproxykey, apiKey) {
   // ... Your code here ...
 }
 
@@ -73,7 +83,8 @@ async function getAirQualityData(apiKey) {
  */
 async function plotAirQualityData(chart) {
   const apiKey = getApiKey();
-  const aqData = await getAirQualityData(apiKey);
+  const corsproxykey = getCorsProxyKey();
+  const aqData = await getAirQualityData(corsproxykey, apiKey);
 
   // ... Your code here ...
 }
@@ -100,18 +111,30 @@ function indicateEndLoading() {
   }
 }
 
-// Set up the OpenAQ API Key
-if (!getApiKey()) {
+// Set up the API Keys
+if (!getApiKey() || !getCorsProxyKey()) {
   showApiKeyDialog();
 }
 
 updateApiKeyDisplay();
 
-// Set up the chart and it's data
+// Set up the chart and its data
 window.aqChart = initChart('aqi-chart');
 try {
   indicateStartLoading();
   await plotAirQualityData(window.aqChart);
 } finally {
   indicateEndLoading();
+}
+
+const openaqDialogForm = document.querySelector('#openaqkey-dialog form');
+if (openaqDialogForm) {
+  openaqDialogForm.addEventListener('submit', async () => {
+    try {
+      indicateStartLoading();
+      await plotAirQualityData(window.aqChart);
+    } finally {
+      indicateEndLoading();
+    }
+  });
 }

@@ -59,6 +59,6 @@ Work with local and global datasets that are immediately visual and cover differ
     * **Result:** A simple webpage listing the countries of a selected world region.
 
 6. **Chart of Air Quality in a Major City:**
-    * **Goal:** Pick a major world location (e.g., Delhi, São Paulo, Lagos). Use the OpenAQ V3 API (which requires an API key passed via the `X-API-Key` header) to get the latest PM2.5 measurements and display them on a time-series line chart.
-    * **Skills:** Pass custom authentication headers in `fetch` (`X-API-Key`). Process the resulting JSON to format two arrays/columns for Billboard.js: one for timestamps (e.g., `["x", ...]`) and one for values (e.g., `["pm25", ...]`). Use Billboard.js to render a timeseries line chart.
+    * **Goal:** Pick a major world location (e.g., Delhi, São Paulo, Lagos). Use the OpenAQ V3 API (which requires an API key passed via the `X-API-Key` header) via a CORS proxy (`corsproxy.io`, requiring a free CORS proxy key) to get the latest PM2.5 measurements and display them on a time-series line chart.
+    * **Skills:** Route API requests through a CORS proxy with URL encoding (`encodeURIComponent`) and pass custom authentication headers in `fetch` (`X-API-Key`). Process the resulting JSON to format two arrays/columns for Billboard.js: one for timestamps (e.g., `["x", ...]`) and one for values (e.g., `["pm25", ...]`). Use Billboard.js to render a timeseries line chart.
     * **Result:** A time-series line chart showing recent air pollution trends in a specific city rendered with Billboard.js.
