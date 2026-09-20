@@ -19,8 +19,8 @@ INSTRUCTIONS
     And pass your OpenAQ API key via the `X-API-Key` header:
       fetch(proxyUrl, { headers: { 'X-API-Key': apiKey } })
 
-    For example, you can query measurements for a specific location ID (e.g., Delhi: 6139):
-      `https://api.openaq.org/v3/locations/${location_id}/measurements?parameters_id=2&limit=100`
+    For example, you can query measurements for a specific PM2.5 sensor ID (e.g., London Marylebone Road: 246):
+      `https://api.openaq.org/v3/sensors/${sensor_id}/measurements?limit=100`
 
 2.  Update the plotAirQualityData function to process the fetched measurements into
     two column arrays for Billboard.js:
