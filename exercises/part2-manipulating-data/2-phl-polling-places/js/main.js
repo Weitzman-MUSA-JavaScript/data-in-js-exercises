@@ -15,6 +15,8 @@ INSTRUCTIONS
 
 */
 
+import 'leaflet';
+
 /* globals L */
 
 /**

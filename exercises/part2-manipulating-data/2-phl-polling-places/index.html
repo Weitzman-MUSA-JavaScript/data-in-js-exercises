@@ -7,10 +7,18 @@
     <title>Philadelphia Polling Places</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <link rel="icon" type="image/x-png" href="img/favicon.png">
+    <link rel="stylesheet" href="../../../common-components/style.css">
     <link rel="stylesheet" href="css/styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            }
+        }
+    </script>
     <script type="module" src="js/main.js"></script>
 </head>
 <body>
@@ -19,7 +27,10 @@
         <p class="info"></p>
     </header>
     <main>
-        <div id="map" class="map"></div>
+        <div id="map" class="map visualization-container"></div>
     </main>
+    <footer>
+        <p>Data from <a href="https://opendataphilly.org/datasets/polling-places/" target="_blank" rel="noopener">OpenDataPhilly</a>.</p>
+    </footer>
 </body>
 </html>
