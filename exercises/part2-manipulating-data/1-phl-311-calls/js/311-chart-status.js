@@ -2,7 +2,7 @@
  * Module for creating and managing the status pie chart
  */
 
-import { Chart } from 'chart.js/auto';
+import bb, { pie } from 'billboard.js';
 
 let statusChart = null;
 let currentStatusFilter = null;
@@ -22,86 +22,61 @@ function aggregateCallsByStatus(calls) {
  * @param {Function} onFilterChange - Callback function when filter changes
  */
 function initStatusChart(calls, onFilterChange) {
-  const canvas = document.getElementById('status-chart');
+  const container = document.getElementById('status-chart');
 
   // Aggregate the data
   const statusData = aggregateCallsByStatus(calls);
   const labels = Object.keys(statusData);
-  const data = Object.values(statusData);
+  const columns = Object.entries(statusData);
 
   // Define colors for each status
   const baseColors = {
-    'Open': '#dc3545',
-    'Closed': '#28a745',
-    'In Progress': '#ffc107',
-    'Assigned': '#17a2b8',
+    'Open': '#990000',
+    'Closed': '#2e7d32',
+    'In Progress': '#d97706',
+    'Assigned': '#011f5b',
     'Unknown': '#6c757d',
   };
 
-  // Generate colors array
-  const colors = labels.map((label) => baseColors[label] || '#6c757d');
-  const highlightColors = labels.map((label) =>
-    label === currentStatusFilter ? '#ff6b6b' : (baseColors[label] || '#6c757d'),
-  );
+  const colors = {};
+  for (const label of labels) {
+    colors[label] = baseColors[label] || '#6c757d';
+  }
 
   // Destroy existing chart if it exists
   if (statusChart) {
     statusChart.destroy();
   }
 
-  // Create the pie chart
-  statusChart = new Chart(canvas, {
-    type: 'pie',
+  // Create the pie chart using Billboard.js
+  statusChart = bb.generate({
+    bindto: container,
     data: {
-      labels: labels,
-      datasets: [{
-        data: data,
-        backgroundColor: highlightColors,
-        borderColor: '#fff',
-        borderWidth: 2,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            padding: 20,
-            usePointStyle: true,
-          },
-        },
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              const total = context.dataset.data.reduce((sum, val) => sum + val, 0);
-              const percentage = ((context.parsed / total) * 100).toFixed(1);
-              return `${context.label}: ${context.parsed} calls (${percentage}%)`;
-            },
-          },
-        },
-      },
-      onClick: (event, elements) => {
-        if (elements.length > 0) {
-          const elementIndex = elements[0].index;
-          const clickedStatus = labels[elementIndex];
+      columns: columns,
+      type: pie(),
+      colors: colors,
+      onclick: (d) => {
+        const clickedStatus = d.name || d.id;
 
-          // Toggle filter
-          if (currentStatusFilter === clickedStatus) {
-            // Remove filter
-            currentStatusFilter = null;
-            onFilterChange(null, 'status');
-          } else {
-            // Apply filter
-            currentStatusFilter = clickedStatus;
-            onFilterChange(clickedStatus, 'status');
-          }
-
-          // Update chart colors
-          updateChartColors();
+        // Toggle filter
+        if (currentStatusFilter === clickedStatus) {
+          currentStatusFilter = null;
+          onFilterChange(null, 'status');
+        } else {
+          currentStatusFilter = clickedStatus;
+          onFilterChange(clickedStatus, 'status');
         }
+
+        updateChartColors();
       },
+    },
+    tooltip: {
+      format: {
+        value: (value, ratio) => `${value} calls (${(ratio * 100).toFixed(1)}%)`,
+      },
+    },
+    legend: {
+      position: 'bottom',
     },
   });
 }
@@ -111,19 +86,7 @@ function initStatusChart(calls, onFilterChange) {
  */
 function updateChartColors() {
   if (statusChart) {
-    const labels = statusChart.data.labels;
-    const baseColors = {
-      'Open': '#dc3545',
-      'Closed': '#28a745',
-      'In Progress': '#ffc107',
-      'Assigned': '#17a2b8',
-      'Unknown': '#6c757d',
-    };
-
-    statusChart.data.datasets[0].backgroundColor = labels.map((label) =>
-      label === currentStatusFilter ? '#ff6b6b' : (baseColors[label] || '#6c757d'),
-    );
-    statusChart.update();
+    statusChart.flush();
   }
 }
 

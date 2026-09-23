@@ -6,7 +6,7 @@ INSTRUCTIONS
 This exercise builds on the phl-311-calls exercise from Part 1 to demonstrate:
 - Summarizing/aggregating data with Array.reduce()
 - Creating interactive charts that cross-filter other page components
-- Using Chart.js for data visualization
+- Using Billboard.js for data visualization
 
 The dashboard framework is already set up with interactive charts and cross-filtering.
 Your task is to implement the key data manipulation functions:
@@ -43,7 +43,7 @@ complete these functions, you'll have a fully working dashboard where:
 
 */
 
-import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+import * as d3 from 'd3';
 import { displayCalls } from './311-list-calls.js';
 import { initTypeChart, clearTypeFilter, getCurrentTypeFilter } from './311-chart-calltype.js';
 import { initStatusChart, clearStatusFilter, getCurrentStatusFilter } from './311-chart-status.js';

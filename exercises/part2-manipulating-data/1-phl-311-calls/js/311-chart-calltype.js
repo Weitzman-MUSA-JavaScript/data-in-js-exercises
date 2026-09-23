@@ -2,7 +2,7 @@
  * Module for creating and managing the call type bar chart
  */
 
-import { Chart } from 'chart.js/auto';
+import bb, { bar } from 'billboard.js';
 
 let callTypeChart = null;
 let currentCallTypeFilter = null;
@@ -22,7 +22,7 @@ function aggregateCallsByType(calls) {
  * @param {Function} onFilterChange - Callback function when filter changes
  */
 function initTypeChart(calls, onFilterChange) {
-  const canvas = document.getElementById('calltype-chart');
+  const container = document.getElementById('calltype-chart');
 
   // Aggregate the data
   const typeData = aggregateCallsByType(calls);
@@ -35,67 +35,50 @@ function initTypeChart(calls, onFilterChange) {
   }
 
   // Create the bar chart
-  callTypeChart = new Chart(canvas, {
-    type: 'bar',
+  callTypeChart = bb.generate({
+    bindto: container,
     data: {
-      labels: labels,
-      datasets: [{
-        label: 'Number of Calls',
-        data: data,
-        backgroundColor: labels.map((label) =>
-          label === currentCallTypeFilter ? '#ff6b6b' : '#4ecdc4',
-        ),
-        borderColor: '#2c3e50',
-        borderWidth: 1,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          display: false,
-        },
-        tooltip: {
-          callbacks: {
-            title: (context) => context[0].label,
-            label: (context) => `${context.parsed.y} calls`,
-          },
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1,
-          },
-        },
-        x: {
-          ticks: {
-            maxRotation: 45,
-            minRotation: 45,
-          },
-        },
-      },
-      onClick: (event, elements) => {
-        if (elements.length > 0) {
-          const elementIndex = elements[0].index;
-          const clickedType = labels[elementIndex];
+      x: 'Call Types',
+      columns: [
+        ['Call Types', ...labels],
+        ['Calls', ...data],
+      ],
+      type: bar(),
+      colors: Object.fromEntries(labels.map((label) =>
+        [label, label === currentCallTypeFilter ? '#990000' : '#011f5b'],
+      )),
+      onclick: (d) => {
+        const clickedType = labels[d.index];
 
-          // Toggle filter
-          if (currentCallTypeFilter === clickedType) {
-            // Remove filter
-            currentCallTypeFilter = null;
-            onFilterChange(null, 'calltype');
-          } else {
-            // Apply filter
-            currentCallTypeFilter = clickedType;
-            onFilterChange(clickedType, 'calltype');
-          }
-
-          // Update chart colors
-          updateChartColors();
+        // Toggle filter
+        if (currentCallTypeFilter === clickedType) {
+          currentCallTypeFilter = null;
+          onFilterChange(null, 'calltype');
+        } else {
+          currentCallTypeFilter = clickedType;
+          onFilterChange(clickedType, 'calltype');
         }
+
+        updateChartColors();
+      },
+    },
+    axis: {
+      x: {
+        type: 'category',
+        tick: {
+          rotate: -60,
+          multiline: false,
+          culling: false,
+        },
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      format: {
+        title: (x) => labels[x] || x,
+        value: (value) => `${value} calls`,
       },
     },
   });
@@ -106,11 +89,7 @@ function initTypeChart(calls, onFilterChange) {
  */
 function updateChartColors() {
   if (callTypeChart) {
-    const labels = callTypeChart.data.labels;
-    callTypeChart.data.datasets[0].backgroundColor = labels.map((label) =>
-      label === currentCallTypeFilter ? '#ff6b6b' : '#4ecdc4',
-    );
-    callTypeChart.update();
+    callTypeChart.flush();
   }
 }
 
