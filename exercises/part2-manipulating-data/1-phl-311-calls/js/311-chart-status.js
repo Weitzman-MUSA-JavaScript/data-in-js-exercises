@@ -18,11 +18,13 @@ function aggregateCallsByStatus(calls) {
 
 /**
  * Initialize and render the status pie chart
+ * @param {string|HTMLElement} el - The CSS selector or DOM element for the container element of the chart
  * @param {Array} calls - Array of call objects
- * @param {Function} onFilterChange - Callback function when filter changes
+ * @param {Function|null} onFilterChange - Callback function when filter changes
+ * @returns {HTMLElement} The container element for the chart
  */
-function initStatusChart(calls, onFilterChange) {
-  const container = document.getElementById('status-chart');
+function initStatusChart(el, calls, onFilterChange = null) {
+  const container = typeof el === 'string' ? document.querySelector(el) : el;
 
   // Aggregate the data
   const statusData = aggregateCallsByStatus(calls);
@@ -61,10 +63,12 @@ function initStatusChart(calls, onFilterChange) {
         // Toggle filter
         if (currentStatusFilter === clickedStatus) {
           currentStatusFilter = null;
-          onFilterChange(null, 'status');
+          const event = new CustomEvent('filterChange', { detail: { type: 'status', value: null } });
+          container.dispatchEvent(event);
         } else {
           currentStatusFilter = clickedStatus;
-          onFilterChange(clickedStatus, 'status');
+          const event = new CustomEvent('filterChange', { detail: { type: 'status', value: clickedStatus } });
+          container.dispatchEvent(event);
         }
 
         updateChartColors();
@@ -79,6 +83,23 @@ function initStatusChart(calls, onFilterChange) {
       position: 'bottom',
     },
   });
+
+  // We may initialize this chart multiple times, so we use an AbortController
+  // to clear any previous event listeners. For why this is necessary, see:
+  // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#memory_issues
+  if (!container.abortController) {
+    container.abortController = new AbortController();
+  }
+
+  container.abortController.abort();
+  const signal = container.abortController.signal;
+
+  // Add event listener for filter changes
+  if (typeof onFilterChange === 'function') {
+    container.addEventListener('filterChange', onFilterChange, { signal });
+  }
+
+  return container;
 }
 
 /**

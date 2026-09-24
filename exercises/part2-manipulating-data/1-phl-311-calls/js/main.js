@@ -56,6 +56,8 @@ let filteredCalls = [];
 const filterInfoElement = document.getElementById('filter-info');
 const filterDescriptionElement = document.getElementById('filter-description');
 const clearFilterButton = document.getElementById('clear-filter');
+const callTypeChartElement = document.getElementById('calltype-chart');
+const statusChartElement = document.getElementById('status-chart');
 
 /**
  * Fetch and parse the CSV data from the API using D3
@@ -110,10 +112,13 @@ function updateFilterInfo() {
 
 /**
  * Handle filter changes from charts
- * @param {string|null} filterValue - The filter value or null to clear
- * @param {string} filterType - Type of filter ('calltype' or 'status')
+ * @param {CustomEvent} evt - The filter change event
+ * @param {string|null} evt.detail.value - The filter value or null to clear
+ * @param {string} evt.detail.type - Type of filter ('calltype' or 'status')
  */
-function handleFilterChange(filterValue, filterType) {
+function handleFilterChange(evt) {
+  const filterValue = evt.detail.value;
+  const filterType = evt.detail.type;
   console.log(`Filter changed: ${filterType} = ${filterValue}`);
 
   // Update filtered data
@@ -125,8 +130,8 @@ function handleFilterChange(filterValue, filterType) {
 
   // Update both charts with filtered data
   // This allows for cross-filtering between charts
-  initTypeChart(filteredCalls, handleFilterChange);
-  initStatusChart(filteredCalls, handleFilterChange);
+  initTypeChart(callTypeChartElement, filteredCalls, handleFilterChange);
+  initStatusChart(statusChartElement, filteredCalls, handleFilterChange);
 }
 
 /**
@@ -141,8 +146,8 @@ function clearAllFilters() {
   updateFilterInfo();
 
   // Reinitialize charts with all data
-  initTypeChart(filteredCalls, handleFilterChange);
-  initStatusChart(filteredCalls, handleFilterChange);
+  initTypeChart(callTypeChartElement, filteredCalls, handleFilterChange);
+  initStatusChart(statusChartElement, filteredCalls, handleFilterChange);
 }
 
 /**
@@ -155,8 +160,8 @@ function initializeDashboard(calls) {
 
   // Initialize all components
   displayCalls(filteredCalls);
-  initTypeChart(filteredCalls, handleFilterChange);
-  initStatusChart(filteredCalls, handleFilterChange);
+  initTypeChart(callTypeChartElement, filteredCalls, handleFilterChange);
+  initStatusChart(statusChartElement, filteredCalls, handleFilterChange);
   updateFilterInfo();
 
   // Add clear filter button event listener

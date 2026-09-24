@@ -18,11 +18,13 @@ function aggregateCallsByType(calls) {
 
 /**
  * Initialize and render the call type bar chart
+ * @param {string|HTMLElement} el - The CSS selector or DOM element for the container element of the chart
  * @param {Array} calls - Array of call objects
- * @param {Function} onFilterChange - Callback function when filter changes
+ * @param {Function|null} onFilterChange - Callback function when filter changes
+ * @returns {HTMLElement} The container element for the chart
  */
-function initTypeChart(calls, onFilterChange) {
-  const container = document.getElementById('calltype-chart');
+function initTypeChart(el, calls, onFilterChange = null) {
+  const container = typeof el === 'string' ? document.querySelector(el) : el;
 
   // Aggregate the data
   const typeData = aggregateCallsByType(calls);
@@ -53,10 +55,12 @@ function initTypeChart(calls, onFilterChange) {
         // Toggle filter
         if (currentCallTypeFilter === clickedType) {
           currentCallTypeFilter = null;
-          onFilterChange(null, 'calltype');
+          const event = new CustomEvent('filterChange', { detail: { type: 'calltype', value: null } });
+          container.dispatchEvent(event);
         } else {
           currentCallTypeFilter = clickedType;
-          onFilterChange(clickedType, 'calltype');
+          const event = new CustomEvent('filterChange', { detail: { type: 'calltype', value: clickedType } });
+          container.dispatchEvent(event);
         }
 
         updateChartColors();
@@ -82,6 +86,23 @@ function initTypeChart(calls, onFilterChange) {
       },
     },
   });
+
+  // We may initialize this chart multiple times, so we use an AbortController
+  // to clear any previous event listeners. For why this is necessary, see:
+  // https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#memory_issues
+  if (!container.abortController) {
+    container.abortController = new AbortController();
+  }
+
+  container.abortController.abort();
+  const signal = container.abortController.signal;
+
+  // Add event listener for filter changes
+  if (typeof onFilterChange === 'function') {
+    container.addEventListener('filterChange', onFilterChange, { signal });
+  }
+
+  return container;
 }
 
 /**
