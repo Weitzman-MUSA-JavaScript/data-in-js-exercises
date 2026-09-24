@@ -54,6 +54,39 @@ function initMap(options = {}) {
  */
 function updateEarthquakesOnMap(map, earthquakes = []) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!map || !map.markerLayer) return;
+
+  map.markerLayer.clearLayers();
+
+  earthquakes.forEach((feature) => {
+    const coords = feature.geometry?.coordinates;
+    if (!coords || coords.length < 2) return;
+
+    const [lng, lat, depth = 0] = coords;
+    const mag = feature.properties?.mag ?? 0;
+    const title = feature.properties?.title || 'Earthquake';
+
+    const radius = Math.max(2, mag * 3);
+    const color = getColorFromDepth(depth);
+
+    const marker = L.circleMarker([lat, lng], {
+      radius,
+      fillColor: color,
+      color: '#222',
+      weight: 1,
+      fillOpacity: 0.7,
+    });
+
+    marker.bindPopup(`
+      <strong>${title}</strong><br>
+      Magnitude: ${mag}<br>
+      Depth: ${depth} km
+    `);
+
+    marker.addTo(map.markerLayer);
+  });
+  // === END SAMPLE SOLUTION ===
 }
 
 export {
