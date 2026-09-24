@@ -107,22 +107,20 @@ async function initApp() {
   try {
     allSites = await fetchParkSites();
 
-    cardComponent = initCard({
-      el: '#acreage-card',
-    });
+    cardComponent = initCard('#acreage-card');
 
-    formComponent = initForm({
-      el: '#park-sites-controls',
-      sites: allSites,
-      onSelect: handleSelectChange,
-      onReset: handleReset,
-    });
+    formComponent = initForm(
+      '#park-sites-controls',
+      allSites,
+      handleSelectChange,
+      handleReset,
+    );
 
-    mapComponent = initMap({
-      el: '#map',
-      sites: allSites,
-      onSelect: handleSelectChange,
-    });
+    mapComponent = initMap(
+      '#map',
+      allSites,
+      handleSelectChange,
+    );
 
     syncState();
   } catch (error) {
