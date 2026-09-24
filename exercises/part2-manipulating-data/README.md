@@ -17,6 +17,9 @@ Here, you'll move beyond simple display to transforming data. We introduce array
 ### **Exercise Ideas**
 
 1. **Filtering 311 Calls by Type:**
+
+    [1-phl-311-calls/](1-phl-311-calls/)
+
     Here we will build on the 311 calls list from Part 1. Instead of just displaying the most recent calls, we will display charts with certain aggregated metrics, and allow the user to filter by type of service.
 
     * **Goal:** Display most recent 311 calls in a list, and two charts: one showing the number of calls by type, and another showing the share of calls for each status. Allow the user to filter what's visible. For example, clicking a bar in the "calls by type" chart should filter the list and the "status" chart to only show calls of that type. Clicking on the same bar again should remove the filter.
@@ -24,11 +27,17 @@ Here, you'll move beyond simple display to transforming data. We introduce array
     * **Result:** An interactive chart where a user can toggle different categories of service requests.
 
 2. **Deduplicating Polling Places:**
+
+    [2-phl-polling-places/](2-phl-polling-places/)
+
     * **Goal:** In the data, since multiple precincts may vote at a given polling place, there are duplicate entries for many polling places (e.g. precincts 0107, 3927, and 3932 all vote at the Bok building, but each have separate features in the download data). Ensure that each polling place is represented only once.
     * **Skills:** Use `Array.prototype.reduce()` to build a new array of unique polling places. The reducer function can check if the current polling place's address is already in a new array. If not, add it; if so, append the precinct information to a `precincts` array in that polling place's properties. This teaches how to build complex objects from simpler ones.
     * **Result:** A map where each popup gives more useful information, including the list of all precincts that vote there.
 
 3. **Calculating Total Park Acreage:**
+
+    [3-phl-parks/](3-phl-parks/)
+
     * **Goal:** Use the Parks GeoJSON to calculate the total acreage of parkland managed by Philadelphia Parks & Recreation.
     * **Skills:** This is a perfect use case for `Array.prototype.reduce()`. First, you might need to `filter` the dataset to only include properties owned by the correct department. Then, use `reduce` to iterate over the filtered array, summing the values from the `ACREAGE` property into a single number. Display this number on the page.
     * **Result:** A simple webpage stating, "The total park acreage is X."
