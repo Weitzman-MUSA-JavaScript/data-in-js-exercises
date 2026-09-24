@@ -41,59 +41,63 @@ function initChart(options = {}) {
     const maxCount = binnedData.maxCount || 1;
     const range = maxCount - minCount;
 
-    if (chart) {
-      chart.destroy();
-    }
+    const chartData = {
+      xs: {
+        magnitude: 'depth',
+      },
+      columns: [
+        ['depth', ...binnedData.depths],
+        ['magnitude', ...binnedData.magnitudes],
+      ],
+      type: scatter(),
+      colors: {
+        magnitude: (d) => {
+          const count = currentCounts[d.index];
+          const t = range > 0 ? (count - minCount) / range : 0.5;
+          // Use D3 color interpolator for a continuous yellow-to-red heatmap ramp
+          return d3.interpolateYlOrRd(0.2 + 0.8 * t);
+        },
+      },
+    };
 
-    chart = bb.generate({
-      bindto: container,
-      data: {
-        xs: {
-          magnitude: 'depth',
+    if (!chart) {
+      chart = bb.generate({
+        bindto: container,
+        data: chartData,
+        point: {
+          type: 'rectangle',
+          r: 6,
         },
-        columns: [
-          ['depth', ...binnedData.depths],
-          ['magnitude', ...binnedData.magnitudes],
-        ],
-        type: scatter(),
-        color: (color, d) => {
-          if (d && typeof d.index === 'number' && currentCounts[d.index] !== undefined) {
-            const count = currentCounts[d.index];
-            const t = range > 0 ? (count - minCount) / range : 0.5;
-            // Use D3 color interpolator for a continuous yellow-to-red heatmap ramp
-            return d3.interpolateYlOrRd(0.2 + 0.8 * t);
-          }
-          return color;
+        transition: {
+          duration: null,
         },
-      },
-      point: {
-        type: 'rectangle',
-        r: 6,
-      },
-      axis: {
-        x: {
-          label: 'Depth (km)',
-          tick: {
-            fit: false,
+        axis: {
+          x: {
+            label: 'Depth (km)',
+            tick: {
+              fit: false,
+            },
+          },
+          y: {
+            label: 'Magnitude',
           },
         },
-        y: {
-          label: 'Magnitude',
+        legend: {
+          show: false,
         },
-      },
-      legend: {
-        show: false,
-      },
-      tooltip: {
-        format: {
-          title: (x) => `Depth: ${x.toLocaleString(undefined, { maximumFractionDigits: 2 })} km`,
-          value: (value, ratio, id, index) => {
-            const count = currentCounts[index] || 1;
-            return `Mag ${value.toLocaleString(undefined, { maximumFractionDigits: 2 })} (${count} quake${count === 1 ? '' : 's'})`;
+        tooltip: {
+          format: {
+            title: (x) => `Depth: ${x.toLocaleString(undefined, { maximumFractionDigits: 2 })} km`,
+            value: (value, ratio, id, index) => {
+              const count = currentCounts[index] || 1;
+              return `Mag ${value.toLocaleString(undefined, { maximumFractionDigits: 2 })} (${count} quake${count === 1 ? '' : 's'})`;
+            },
           },
         },
-      },
-    });
+      });
+    } else {
+      chart.load(chartData);
+    }
   }
 
   return {
