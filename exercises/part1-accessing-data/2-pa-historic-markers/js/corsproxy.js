@@ -2,8 +2,10 @@ const dialog = document.getElementById('corsproxykey-dialog');
 const form = dialog.querySelector('form');
 const showDialogButton = document.getElementById('show-corsproxykey-dialog-button');
 const corsProxyKeyDisplay = document.getElementById('corsproxykey-display');
+const corsproxyInput = form.querySelector('input[name="corsproxykey"]');
 
 function showCorsProxyKeyDialog() {
+  corsproxyInput.value = getCorsProxyKey() || '';
   dialog.showModal();
 }
 
