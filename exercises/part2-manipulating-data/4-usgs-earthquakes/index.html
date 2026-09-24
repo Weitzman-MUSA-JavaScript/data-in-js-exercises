@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filtering Earthquakes by Magnitude and Depth</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.min.css">
+
+    <link rel="stylesheet" href="../../../common-components/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+                "billboard.js": "https://cdn.jsdelivr.net/npm/billboard.js/+esm",
+                "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>USGS Earthquakes: Magnitude &amp; Depth Filter</h1>
+        <p class="info">Explore global earthquake activity with interactive filtering and binned scatter visualization</p>
+    </header>
+    <main>
+        <div class="sidebar-layout">
+            <aside class="sidebar">
+                <form id="earthquake-controls" class="controls">
+                    <h2>Filter Earthquakes</h2>
+
+                    <div class="form-group">
+                        <label for="mag-slider">
+                            Minimum Magnitude: <span id="mag-value">0.0</span>
+                        </label>
+                        <input type="range" id="mag-slider" name="mag-slider" min="0" max="10" step="0.5" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-depth-slider">
+                            Minimum Depth (km): <span id="min-depth-value">0</span>
+                        </label>
+                        <input type="range" id="min-depth-slider" name="min-depth-slider" min="0" max="700" step="10" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="max-depth-slider">
+                            Maximum Depth (km): <span id="max-depth-value">700</span>
+                        </label>
+                        <input type="range" id="max-depth-slider" name="max-depth-slider" min="0" max="700" step="10" value="700">
+                    </div>
+
+                    <div class="count-display">
+                        <p>Showing <span id="earthquake-count">0</span> earthquakes</p>
+                    </div>
+                </form>
+
+                <section class="chart-section">
+                    <h3>Magnitude vs. Depth Heatmap</h3>
+                    <div id="earthquake-chart"></div>
+                </section>
+            </aside>
+
+            <section class="map-section">
+                <div id="map" class="map visualization-container"></div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>Data from <a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php" target="_blank" rel="noopener">USGS Earthquake Hazards Program</a>.</p>
+    </footer>
+</body>
+</html>
+

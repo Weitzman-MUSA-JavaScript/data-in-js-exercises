@@ -43,6 +43,9 @@ Here, you'll move beyond simple display to transforming data. We introduce array
     * **Result:** An interactive map and form where a user can select park sites around Philadelphia and see the total acreage covered by those sites.
 
 4. **Filtering Earthquakes by Magnitude and Depth:**
+
+    [4-usgs-earthquakes/](4-usgs-earthquakes/)
+
     * **Goal:** Enhance the earthquake map from Part 1. Add UI controls (buttons or a slider) that allow a user to **filter** the displayed earthquakes by magnitude (e.g., > 4.5) or depth.
     * **Skills:** Use `Array.prototype.filter()` based on user input to create new, smaller arrays from the master earthquake list. Introduce the concept of a "render" function that clears the map and draws a new set of markers based on the currently filtered data. This is a key pattern in interactive web mapping.
     * **Result:** An interactive global earthquake map where users can explore relationships between magnitude, depth, and location.
