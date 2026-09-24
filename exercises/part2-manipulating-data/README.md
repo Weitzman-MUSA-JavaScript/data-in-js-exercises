@@ -40,7 +40,7 @@ Here, you'll move beyond simple display to transforming data. We introduce array
 
     * **Goal:** Use the Parks GeoJSON to calculate the total acreage of parkland managed by Philadelphia Parks & Recreation.
     * **Skills:** This is a perfect use case for `Array.prototype.reduce()`. First, you might need to `filter` the dataset to only include properties owned by the correct department. Then, use `reduce` to iterate over the filtered array, summing the values from the `ACREAGE` property into a single number. Display this number on the page.
-    * **Result:** A simple webpage stating, "The total park acreage is X."
+    * **Result:** An interactive map and form where a user can select park sites around Philadelphia and see the total acreage covered by those sites.
 
 4. **Filtering Earthquakes by Magnitude and Depth:**
     * **Goal:** Enhance the earthquake map from Part 1. Add UI controls (buttons or a slider) that allow a user to **filter** the displayed earthquakes by magnitude (e.g., > 4.5) or depth.
