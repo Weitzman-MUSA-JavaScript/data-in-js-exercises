@@ -82,7 +82,7 @@ function applyFilters() {
   }
 
   if (chartComponent) {
-    const binnedData = binEarthquakes(filtered);
+    const binnedData = binEarthquakes(filtered, 10, 20);
     chartComponent.update(binnedData);
   }
 }
