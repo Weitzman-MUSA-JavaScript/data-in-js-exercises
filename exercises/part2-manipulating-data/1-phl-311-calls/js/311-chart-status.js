@@ -96,7 +96,7 @@ function initStatusChart(el, calls, onFilterChange = null) {
 
   // Add event listener for filter changes
   if (typeof onFilterChange === 'function') {
-    container.addEventListener('filterChange', onFilterChange, { signal });
+    container.addEventListener('filterChange', onFilterChange, signal);
   }
 
   return container;
