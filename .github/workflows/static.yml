@@ -33,6 +33,25 @@ jobs:
         uses: actions/checkout@v7
       - name: Setup Pages
         uses: actions/configure-pages@v6
+      - name: Convert root README to index.html
+        uses: davorg/readme-to-index@v1
+        with:
+          install_pandoc: true
+      - name: Convert Part 1 README to index.html
+        uses: davorg/readme-to-index@v1
+        with:
+          readme: exercises/part1-accessing-data/README.md
+          output: exercises/part1-accessing-data/index.html
+      - name: Convert Part 2 README to index.html
+        uses: davorg/readme-to-index@v1
+        with:
+          readme: exercises/part2-manipulating-data/README.md
+          output: exercises/part2-manipulating-data/index.html
+      - name: Convert Part 3 README to index.html
+        uses: davorg/readme-to-index@v1
+        with:
+          readme: exercises/part3-combining-data/README.md
+          output: exercises/part3-combining-data/index.html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
