@@ -13,6 +13,14 @@ const DATA_URL = 'https://opendata.arcgis.com/datasets/d52445160ab14380a673e5849
  */
 async function fetchParkSites() {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const response = await fetch(DATA_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch park sites: ${response.status} ${response.statusText}`);
+  }
+  const geojson = await response.json();
+  return geojson.features || [];
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -25,6 +33,18 @@ async function fetchParkSites() {
  */
 function filterParkSites(sites, searchString) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!searchString || searchString.trim() === '') {
+    return sites;
+  }
+
+  const query = searchString.trim().toLowerCase();
+  return sites.filter((site) => {
+    const siteName = (site.properties?.site_name || '').toLowerCase();
+    const parkName = (site.properties?.park_name || '').toLowerCase();
+    return siteName.includes(query) || parkName.includes(query);
+  });
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -35,6 +55,16 @@ function filterParkSites(sites, searchString) {
  */
 function groupByParkName(sites) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  return sites.reduce((grouped, site) => {
+    const parkName = site.properties?.park_name || 'Other';
+    if (!grouped[parkName]) {
+      grouped[parkName] = [];
+    }
+    grouped[parkName].push(site);
+    return grouped;
+  }, {});
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -49,6 +79,25 @@ function groupByParkName(sites) {
  */
 function calcTotalAcreage(selectedSites) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const selectedParentParks = new Set(
+    selectedSites
+      .filter((site) => site.properties?.nested !== 'Y' && site.properties?.park_name)
+      .map((site) => site.properties.park_name),
+  );
+
+  return selectedSites.reduce((total, site) => {
+    const isNested = site.properties?.nested === 'Y';
+    const parentPark = site.properties?.park_name;
+
+    if (isNested && selectedParentParks.has(parentPark)) {
+      return total;
+    }
+
+    const acreage = Number(site.properties?.acreage) || 0;
+    return total + acreage;
+  }, 0);
+  // === END SAMPLE SOLUTION ===
 }
 
 export {
