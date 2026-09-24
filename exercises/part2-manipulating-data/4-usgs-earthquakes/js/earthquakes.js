@@ -15,6 +15,14 @@ const DATA_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_
  */
 async function fetchEarthquakes() {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const response = await fetch(DATA_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch earthquake data: ${response.status} ${response.statusText}`);
+  }
+  const geojson = await response.json();
+  return geojson.features || [];
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -29,6 +37,16 @@ async function fetchEarthquakes() {
  */
 function filterEarthquakes(earthquakes, filters = {}) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const { minMag = 0, minDepth = 0, maxDepth = Infinity } = filters;
+
+  return earthquakes.filter((feature) => {
+    const mag = feature.properties?.mag ?? 0;
+    const depth = feature.geometry?.coordinates?.[2] ?? 0;
+
+    return mag >= minMag && depth >= minDepth && depth <= maxDepth;
+  });
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -42,6 +60,40 @@ function filterEarthquakes(earthquakes, filters = {}) {
  */
 function binEarthquakes(earthquakes, magBinCount = 10, depthBinCount = 10) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!earthquakes || earthquakes.length === 0) {
+    return { depths: [], magnitudes: [], counts: [], maxCount: 0 };
+  }
+
+  const [minMag, maxMag] = d3.extent(earthquakes, (d) => d.properties.mag);
+  const [minDepth, maxDepth] = d3.extent(earthquakes, (d) => d.geometry.coordinates[2]);
+
+  const magStep = (maxMag - minMag) / magBinCount || 1;
+  const depthStep = (maxDepth - minDepth) / depthBinCount || 1;
+
+  const bins = {};
+  for (const eq of earthquakes) {
+    const mag = eq.properties.mag;
+    const depth = eq.geometry.coordinates[2];
+
+    const magBin = Math.floor(mag / magStep) * magStep;
+    const depthBin = Math.floor(depth / depthStep) * depthStep;
+    const key = `${depthBin}:${magBin}`;
+
+    if (!bins[key]) {
+      bins[key] = { depth: depthBin, mag: magBin, count: 0 };
+    }
+    bins[key].count += 1;
+  }
+
+  const binnedValues = Object.values(bins);
+  const depths = binnedValues.map((b) => b.depth);
+  const magnitudes = binnedValues.map((b) => b.mag);
+  const counts = binnedValues.map((b) => b.count);
+  const maxCount = counts.reduce((max, count) => Math.max(max, count), 0);
+
+  return { depths, magnitudes, counts, maxCount };
+  // === END SAMPLE SOLUTION ===
 }
 
 export {
