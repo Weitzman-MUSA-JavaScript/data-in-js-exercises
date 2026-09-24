@@ -20,7 +20,7 @@ function aggregateCallsByType(calls) {
  * Initialize and render the call type bar chart
  * @param {string|HTMLElement} el - The CSS selector or DOM element for the container element of the chart
  * @param {Array} calls - Array of call objects
- * @param {Function|null} onFilterChange - Callback function when filter changes
+ * @param {Function} [onFilterChange] - Callback function when filter changes; receives custom event with detail containing the filter { type, value }.
  * @returns {HTMLElement} The container element for the chart
  */
 function initTypeChart(el, calls, onFilterChange = null) {

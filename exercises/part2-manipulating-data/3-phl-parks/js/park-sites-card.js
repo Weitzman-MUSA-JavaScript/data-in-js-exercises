@@ -5,14 +5,13 @@
 /**
  * Initializes the park sites acreage card component.
  *
- * @param {Object} options Configuration options for the card.
- * @param {HTMLElement|string} options.el Container element or query selector for the card.
+ * @param {HTMLElement|string} el Container element or query selector for the card.
  * @returns {HTMLElement} The card element, augmented with an updateAcreage method.
  */
-function initCard(options = {}) {
-  const cardEl = typeof options.el === 'string'
-    ? document.querySelector(options.el)
-    : options.el;
+function initCard(el) {
+  const cardEl = typeof el === 'string'
+    ? document.querySelector(el)
+    : el;
 
   if (!cardEl) {
     throw new Error('A valid DOM element or selector must be provided for the card.');

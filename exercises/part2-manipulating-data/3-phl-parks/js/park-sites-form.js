@@ -8,24 +8,23 @@ import { filterParkSites, groupByParkName } from './park-sites.js';
 /**
  * Initializes the park sites selection and filter form component.
  *
- * @param {Object} options Configuration options.
- * @param {HTMLElement|string} options.el Container element or selector for the form controls.
- * @param {Array<Object>} options.sites Complete list of park site GeoJSON feature objects.
- * @param {Function} [options.onSelect] Callback fired when selection changes: (evt.detail=Array<string> selectedSiteNames) => void.
- * @param {Function} [options.onFilter] Callback fired when search filter text changes: (evt.detail=Array<Object> filteredSites) => void.
- * @param {Function} [options.onReset] Callback fired when the reset button is clicked: () => void.
+ * @param {HTMLElement|string} el Container element or selector for the form controls.
+ * @param {Array<Object>} sites Complete list of park site GeoJSON feature objects.
+ * @param {Function} [onSelect] Callback fired when selection changes: (evt.detail=Array<string> selectedSiteNames) => void.
+ * @param {Function} [onFilter] Callback fired when search filter text changes: (evt.detail=Array<Object> filteredSites) => void.
+ * @param {Function} [onReset] Callback fired when the reset button is clicked: () => void.
  * @returns {HTMLElement} The controls container element augmented with helper methods.
  */
-function initForm(options = {}) {
-  const containerEl = typeof options.el === 'string'
-    ? document.querySelector(options.el)
-    : options.el;
+function initForm(el, sites, onSelect = null, onFilter = null, onReset = null) {
+  const containerEl = typeof el === 'string'
+    ? document.querySelector(el)
+    : el;
 
   if (!containerEl) {
     throw new Error('A valid DOM element or selector must be provided for the form.');
   }
 
-  const allSites = options.sites || [];
+  const allSites = sites || [];
   let currentSites = allSites;
   let selectedNames = new Set();
 
@@ -114,14 +113,14 @@ function initForm(options = {}) {
   renderOptions();
 
   // Attach event handlers
-  if (typeof options.onSelect === 'function') {
-    containerEl.addEventListener('select', options.onSelect);
+  if (typeof onSelect === 'function') {
+    containerEl.addEventListener('select', onSelect);
   }
-  if (typeof options.onFilter === 'function') {
-    containerEl.addEventListener('filter', options.onFilter);
+  if (typeof onFilter === 'function') {
+    containerEl.addEventListener('filter', onFilter);
   }
-  if (typeof options.onReset === 'function') {
-    containerEl.addEventListener('reset', options.onReset);
+  if (typeof onReset === 'function') {
+    containerEl.addEventListener('reset', onReset);
   }
 
   containerEl.setSelectedSites = setSelectedSites;

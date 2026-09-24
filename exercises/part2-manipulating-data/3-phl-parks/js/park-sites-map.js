@@ -23,16 +23,15 @@ const SELECTED_STYLE = {
 /**
  * Initializes the park sites Leaflet map.
  *
- * @param {Object} options Configuration options.
- * @param {HTMLElement|string} options.el Element or element ID for the map container.
- * @param {Array<Object>} options.sites GeoJSON features for park sites.
- * @param {Function} [options.onSelect] Callback fired when a polygon is clicked: (evt.detail=Array<string> selectedSiteNames) => void.
+ * @param {HTMLElement|string} el Element or element ID for the map container.
+ * @param {Array<Object>} sites GeoJSON features for park sites.
+ * @param {Function} [onSelect] Callback fired when a polygon is clicked: (evt.detail=Array<string> selectedSiteNames) => void.
  * @returns {L.Map} Leaflet map instance augmented with a setSelectedSites method.
  */
-function initMap(options = {}) {
-  const mapEl = typeof options.el === 'string'
-    ? document.querySelector(options.el)
-    : options.el;
+function initMap(el, sites, onSelect = null) {
+  const mapEl = typeof el === 'string'
+    ? document.querySelector(el)
+    : el;
 
   if (!mapEl) {
     throw new Error('A valid DOM element or selector must be provided for the map.');
@@ -45,7 +44,7 @@ function initMap(options = {}) {
   }).addTo(map);
 
   let selectedNames = new Set();
-  const sites = options.sites || [];
+  sites ||= [];
 
   const geojsonLayer = L.geoJSON(sites, {
     style: () => DEFAULT_STYLE,
@@ -100,8 +99,8 @@ function initMap(options = {}) {
   }
 
   // Attach event handlers
-  if (typeof options.onSelect === 'function') {
-    map.addEventListener('select', options.onSelect);
+  if (typeof onSelect === 'function') {
+    map.addEventListener('select', onSelect);
   }
 
   map.setSelectedSites = setSelectedSites;
