@@ -86,7 +86,6 @@ function initForm(el, sites, onSelect = null, onFilter = null, onReset = null) {
   // Handle reset button click
   containerEl.addEventListener('reset', () => {
     selectedNames.clear();
-    console.log('reset');
     currentSites = allSites;
     renderOptions();
 

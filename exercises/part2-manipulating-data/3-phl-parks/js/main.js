@@ -112,15 +112,15 @@ async function initApp() {
     formComponent = initForm(
       '#park-sites-controls',
       allSites,
-      handleSelectChange,
-      handleReset,
     );
+    formComponent.addEventListener('select', handleSelectChange);
+    formComponent.addEventListener('reset', handleReset);
 
     mapComponent = initMap(
       '#map',
       allSites,
-      handleSelectChange,
     );
+    mapComponent.addEventListener('select', handleSelectChange);
 
     syncState();
   } catch (error) {
