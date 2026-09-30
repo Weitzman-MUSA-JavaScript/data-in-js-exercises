@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Most Polluted Air Quality Stations</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <link rel="stylesheet" href="../../../common-components/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <div id="header-progress" class="header-progress-bar-container">
+            <div id="header-progress-bar" class="header-progress-bar"></div>
+        </div>
+        <h1>Most Polluted Air Quality Stations</h1>
+        <p class="info">Explore PM2.5 monitoring stations and find the highest readings by country</p>
+    </header>
+    <main>
+        <div class="sidebar-layout">
+            <aside class="sidebar">
+                <section class="controls">
+                    <h2>Select Country</h2>
+                    <div class="form-group">
+                        <label for="country-select">Country:</label>
+                        <select id="country-select" name="country-select" disabled>
+                            <option value="">Loading countries...</option>
+                        </select>
+                    </div>
+
+                    <div id="country-loading" class="country-loading" hidden>
+                        <p class="loading-message">Loading monitoring stations...</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+
+                    <div id="pollution-summary" class="pollution-summary card">
+                        <p class="summary-placeholder">Select a country to view PM2.5 monitoring stations and identify the most polluted station.</p>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="map-section">
+                <div id="map" class="map visualization-container"></div>
+            </section>
+        </div>
+
+        <dialog id="openaqkey-dialog">
+            <form id="openaqkey-form" method="dialog">
+                <h2>Enter API Keys</h2>
+                <p>For this exercise you will use the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ API</a> (Version 3) to fetch air quality data. You will need to sign up for a free account on OpenAQ to generate an API key.</p>
+                <p>Because the OpenAQ API does not support direct browser requests with custom headers, you will also need a free CORS proxy key from <a href="https://corsproxy.io/" target="_blank" rel="noopener">corsproxy.io</a>.</p>
+                <label for="openaqkey-input">OpenAQ API Key:</label>
+                <input type="text" id="openaqkey-input" name="openaqkey" required>
+                <label for="corsproxykey-input">CORS Proxy API Key:</label>
+                <input type="text" id="corsproxykey-input" name="corsproxykey" required>
+                <button type="submit">Save</button>
+            </form>
+        </dialog>
+    </main>
+    <footer>
+        <p>Data from the <a href="https://openaq.org/" target="_blank" rel="noopener">OpenAQ Platform</a> via <a href="https://corsproxy.io/" target="_blank" rel="noopener">corsproxy.io</a>.</p>
+        <p>OpenAQ Key: <code id="openaqkey-display"></code> | CORS Proxy Key: <code id="corsproxykey-display"></code> <button id="show-openaqkey-dialog-button" type="button">Update API Keys</button></p>
+    </footer>
+</body>
+</html>

@@ -59,6 +59,9 @@ Here, you'll move beyond simple display to transforming data. We introduce array
     * **Result:** A map of Rome dotted with the locations of its many cafes, pulled from live OpenStreetMap data.
 
 6. **Finding the Most Polluted Monitoring Station:**
-    * **Goal:** Fetch all PM2.5 monitoring stations from OpenAQ for a country like India. Use data manipulation to find the single station with the **highest** current reading.
-    * **Skills:** This is a great task for `Array.prototype.reduce()`. The reducer function can iterate through the list of stations, keeping track of the one with the highest `value` seen so far. Once found, highlight that specific station on a map and display its name and reading.
-    * **Result:** A map of India showing all air quality stations, with the one reporting the worst air quality specially highlighted.
+
+    [6-openaq-pollution/](6-openaq-pollution/)
+
+    * **Goal:** Fetch all PM2.5 monitoring stations from OpenAQ for a country. Use data manipulation to find the single station with the **highest** current reading.
+    * **Skills:** Finding a maximal or minimal value is inherently a reduce operation; either use `Array.prototype.reduce()` or create a loop that does effectifely the same thing, which ever is clearer to you. The reducer function can iterate through the list of stations, keeping track of the one with the highest `value` seen so far. Once found, highlight that specific station on a map and display its name and reading.
+    * **Result:** A map showing all air quality stations within a selected country, with the one reporting the worst air quality specially highlighted. Countries can be selected either by clicking the map, or by choosing the country name in a `select` box. A short paragraph below the select box will describe the country name, the number of sensors, and the maximal sensor information.
