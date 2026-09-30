@@ -82,6 +82,23 @@ main {
   width: 100%;
 }
 
+.loading-overlay {
+  display: none;
+}
+
+.progress-bar-container {
+  display: none;
+}
+
+.loading .loading-overlay {
+  display: flex;
+}
+
+.loading .progress-bar-container {
+  margin-top: 0.5rem;
+  display: block;
+}
+
 @media (width <= 768px) {
   .sidebar-layout {
     flex-direction: column;

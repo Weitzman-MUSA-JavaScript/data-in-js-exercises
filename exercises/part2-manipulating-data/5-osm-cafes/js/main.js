@@ -68,8 +68,16 @@ async function initApp() {
   try {
     map = initMap({ el: '#map' });
 
-    const elements = await fetchCafes();
-    const geojson = transformToGeoJSON(elements);
+    const body = document.querySelector('body');
+    body.classList.add('loading');
+
+    let elements, geojson;
+    try {
+      elements = await fetchCafes();
+      geojson = transformToGeoJSON(elements);
+    } finally {
+      body.classList.remove('loading');
+    }
 
     updateCount(geojson?.features?.length || 0);
     updateCafesOnMap(map, geojson);
