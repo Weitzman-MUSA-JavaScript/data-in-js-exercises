@@ -51,6 +51,9 @@ Here, you'll move beyond simple display to transforming data. We introduce array
     * **Result:** An interactive global earthquake map where users can explore relationships between magnitude, depth, and location.
 
 5. **Mapping Cafes in Rome:** ☕
+
+    [5-osm-cafes/](5-osm-cafes/)
+
     * **Goal:** Use the OpenStreetMap Overpass API to query for all nodes tagged with `amenity=cafe` within the bounding box of Rome, Italy. Display them on a map.
     * **Skills:** Learn to construct an Overpass API query URL. The API returns a custom JSON format, not GeoJSON. Students must use `Array.prototype.map()` to transform the array of OSM nodes into a valid GeoJSON FeatureCollection that Leaflet can easily read and render. This teaches them how to adapt to non-standard data formats.
     * **Result:** A map of Rome dotted with the locations of its many cafes, pulled from live OpenStreetMap data.
