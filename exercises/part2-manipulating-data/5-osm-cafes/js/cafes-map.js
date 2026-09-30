@@ -42,6 +42,40 @@ function initMap(options = {}) {
  */
 function updateCafesOnMap(map, geojson) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!map.cafeLayer) {
+    return;
+  }
+
+  map.cafeLayer.clearLayers();
+
+  const geoJsonLayer = L.geoJSON(geojson, {
+    pointToLayer: (feature, latlng) => L.circleMarker(latlng, {
+      radius: 5,
+      fillColor: '#8B4513',
+      color: '#fff',
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8,
+    }),
+    onEachFeature: (feature, layer) => {
+      const name = feature.properties?.name || 'Unnamed Cafe';
+      const street = feature.properties?.['addr:street'] || '';
+      const housenumber = feature.properties?.['addr:housenumber'] || '';
+      let popupContent = `<strong>${name}</strong>`;
+      if (street) {
+        popupContent += `<br>${street} ${housenumber}`;
+      }
+      layer.bindPopup(popupContent);
+    },
+  });
+
+  map.cafeLayer.addLayer(geoJsonLayer);
+
+  if (geojson?.features && geojson.features.length > 0 && geoJsonLayer.getBounds().isValid()) {
+    map.fitBounds(geoJsonLayer.getBounds());
+  }
+  // === END SAMPLE SOLUTION ===
 }
 
 export {
