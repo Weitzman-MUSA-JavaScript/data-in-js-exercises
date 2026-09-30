@@ -22,7 +22,7 @@ This is the most advanced part, where you must perform a "join" by combining two
     * **Goal:** Create a choropleth map showing the median household income at different US Census geography levels. 🗺️
 
       The map should start showing the entire US, with income data by county and with each state outlined with a thick outline (i.e., use the `us_counties_simplified.geojson` file and the `us_states_simplified.geojson` file). When you click on a state, the map should zoom in to that state and update to show income by census tract (using the relevant `state_{state_fips_code}_tracts_simplified.geojson` file for that state, with each of the counties outlined with a thick outline).
-      
+
     * **Skills:** This requires an **attribute join**. You'll fetch the Census geographies GeoJSON files that I've added to this repository, and the income data from the Census API (using a URLs such as <https://api.census.gov/data/2023/acs/acs5?get=NAME,B06011_001E&for=tract:*&in=state:42> where `state:42` refers to PA, and `B06011_001E` refers to the median household income variable as documented in the [Census ACS API](https://api.census.gov/data/2023/acs/acs5/variables.html)). Convert the array of data into a JavaScript `Map`, or a simple object, for easy lookup, where the key is the state, county, or tract GeoID. Then, update the GeoJSON `features` with the corresponding income from the data map you created. Finally, use this new income property to style the color of each polygon on the Leaflet map.
     * **Result:** A classic color-coded map showing wealth distribution across the county, state, or country.
 
@@ -46,8 +46,10 @@ This is the most advanced part, where you must perform a "join" by combining two
 
 5. **Counting Power Plants by Country (Spatial Join):** ⚡
     * **Goal:** Determine how many power plants from the Global Power Plant Database are located within each country.
-    * **Skills:** This is a classic **spatial join**. Load the countries GeoJSON and the power plants data. Initialize a `count` property (e.g., `feature.properties.plant_count = 0;`) for each country feature. Then, loop through every power plant, create a `turf.point` from its latitude and longitude, and loop through the countries to find which polygon the point falls inside using `turf.booleanPointInPolygon()`. When a match is found, increment the `plant_count` for that country.
-    * **Result:** A map where clicking on any country displays a popup with the total number of power plants located within its borders.
+    * **Skills:** This is a classic **spatial join**. Load the countries GeoJSON and the power plants data. Loop through every power plant, create a `turf.point` from its latitude and longitude, and loop through the countries to find which polygon the point falls inside using `turf.booleanPointInPolygon()`. When a match is found, increment the plant count for that country.
+
+      > Note that the Global Power Plant Database files are published as zip files. There are libraries such as `zip.js` that can work directly with zip files in the browser. In this case you can choose to work with the zip file from the API endpoint directly (for an extra challenge), or manually download the file, extract the CSV data from within into your folder, and load the data from there.
+    * **Result:** A choropleth map where clicking on any country displays a popup with the total number of power plants located within its borders. Users can choose to color countries by their total number of power plants, or their power plant density (i.e. power plants over land area), and can filter power plants by capacity and primary fuel type.
 
 6. **Country Development Profile Dashboard:**
     * **Goal:** Create a simple dashboard. The user selects a country from a dropdown list. The page then updates to show:
