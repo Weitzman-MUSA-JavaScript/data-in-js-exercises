@@ -14,6 +14,23 @@
  */
 async function fetchCafes() {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const query = `
+    [out:json];
+    node["amenity"="cafe"](41.85,12.43,41.95,12.55);
+    out;
+  `;
+  const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query.trim())}`;
+  const response = await fetch(url);
+  if (!response.ok) {
+    const message = `Failed to fetch cafes from Overpass API: ${response.status} ${response.statusText}`;
+    const errorText = await response.text();
+    alert(`${message}. Check the terminal for more details, or try reloading the page.`);
+    throw new Error(`${message}. Response: ${errorText}`);
+  }
+  const data = await response.json();
+  return data.elements || [];
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -22,8 +39,26 @@ async function fetchCafes() {
  * @param {Array<Object>} osmElements Array of OSM node objects from the Overpass API.
  * @returns {Object} A GeoJSON FeatureCollection object.
  */
-function transformToGeoJSON(osmElements) {
+function transformToGeoJSON(osmElements = []) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const features = osmElements.map((element) => ({
+    type: 'Feature',
+    geometry: {
+      type: 'Point',
+      coordinates: [element.lon, element.lat],
+    },
+    properties: {
+      id: element.id,
+      ...element.tags,
+    },
+  }));
+
+  return {
+    type: 'FeatureCollection',
+    features,
+  };
+  // === END SAMPLE SOLUTION ===
 }
 
 export {
