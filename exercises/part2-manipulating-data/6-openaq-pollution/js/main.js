@@ -141,7 +141,7 @@ function updateSummary(countryName, locationsCount, maxReading, maxLocation) {
   const el = htmlToElement(`
     <div>
       <p>In <strong>${countryName}</strong>, there are <strong>${locationsCount}</strong> PM2.5 monitoring stations.</p>
-      <p>The highest reading is at station <span class="station-highlight">${maxLocation.name}</span> with a measurement of <span class="value-highlight">${maxReading.value} µg/m³</span> (reported ${dateStr}).</p>
+      <p>The highest reading is at station <span class="station-highlight">${maxLocation.name}</span> with a measurement of <span class="value-highlight">${maxReading.value.toLocaleString({ minimumFractionDigits: 0, maximumFractionDigits: 3 })} µg/m³</span> (reported ${dateStr}).</p>
     </div>
   `);
   container.appendChild(el);

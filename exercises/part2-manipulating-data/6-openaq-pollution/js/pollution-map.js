@@ -22,7 +22,7 @@ function initMap(options = {}) {
     throw new Error('A valid DOM element or selector must be provided for the map.');
   }
 
-  const map = L.map(mapEl).setView([20, 0], 2);
+  const map = L.map(mapEl, { preferCanvas: true }).setView([20, 0], 2);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -88,7 +88,7 @@ function updateMap(map, locations = [], maxReading = null) {
     const group = L.featureGroup(layers);
     map.fitBounds(group.getBounds(), { padding: [30, 30], maxZoom: 10 });
     if (maxMarker) {
-      maxMarker.openPopup();
+      maxMarker.bringToFront().openPopup();
     }
   }
 }
