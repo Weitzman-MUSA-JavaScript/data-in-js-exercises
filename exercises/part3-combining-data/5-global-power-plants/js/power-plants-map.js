@@ -1,3 +1,5 @@
+import 'leaflet';
+
 /* global L */
 
 /**
@@ -81,14 +83,12 @@ function initMap(options = {}) {
     zoom: 2,
     minZoom: 1,
     maxZoom: 10,
+    zoomSnap: 0,
     worldCopyJump: true,
   });
 
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-  }).addTo(map);
+  // This map uses no base tiles; this allows us to focus on the country
+  // polygons themselves.
 
   let geojsonLayer = null;
   const legend = L.control({ position: 'bottomright' });
@@ -118,6 +118,8 @@ function initMap(options = {}) {
         }),
         onEachFeature: onEachFeatureCallback,
       }).addTo(map);
+
+      map.fitBounds(geojsonLayer.getBounds());
 
       return geojsonLayer;
     },
