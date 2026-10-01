@@ -13,6 +13,14 @@ const POWER_PLANTS_ZIP_DATA_URL = './data/global_power_plants.zip';
  */
 async function loadCountries() {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const response = await fetch(COUNTRIES_DATA_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to load countries: ${response.status} ${response.statusText}`);
+  }
+  const geojson = await response.json();
+  return geojson.features || [];
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -22,6 +30,36 @@ async function loadCountries() {
  */
 async function loadPowerPlants() {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const response = await fetch(POWER_PLANTS_ZIP_DATA_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to load power plants zip: ${response.status} ${response.statusText}`);
+  }
+  const blob = await response.blob();
+  const zipReader = new ZipReader(new BlobReader(blob));
+  const entries = await zipReader.getEntries();
+  const csvEntry = entries.find((entry) => entry.filename.endsWith('.csv'));
+
+  if (!csvEntry) {
+    await zipReader.close();
+    throw new Error('No CSV file found in power plants zip archive');
+  }
+
+  const text = await csvEntry.getData(new TextWriter());
+  await zipReader.close();
+
+  const parsed = d3.csvParse(text, (row) => ({
+    name: row.name,
+    country: row.country,
+    country_long: row.country_long,
+    capacity_mw: +row.capacity_mw || 0,
+    latitude: +row.latitude,
+    longitude: +row.longitude,
+    primary_fuel: row.primary_fuel,
+  }));
+
+  return parsed.filter((plant) => !isNaN(plant.latitude) && !isNaN(plant.longitude));
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -35,6 +73,35 @@ async function loadPowerPlants() {
  */
 function joinPlantsToCountries(powerPlants, countries) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const countryBoxes = countries.map((country) => ({
+    country,
+    bbox: turf.bbox(country),
+    id: country.properties.sov_a3 || country.properties.adm0_a3 || country.properties.name,
+  }));
+
+  for (const plant of powerPlants) {
+    const pt = turf.point([plant.longitude, plant.latitude]);
+
+    const match = countryBoxes.find(({ country, bbox }) => {
+      if (
+        plant.longitude < bbox[0]
+        || plant.latitude < bbox[1]
+        || plant.longitude > bbox[2]
+        || plant.latitude > bbox[3]
+      ) {
+        return false;
+      }
+      return turf.booleanPointInPolygon(pt, country);
+    });
+
+    if (match) {
+      plant.country_id = match.id;
+    }
+  }
+
+  return powerPlants;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -46,6 +113,16 @@ function joinPlantsToCountries(powerPlants, countries) {
  */
 function filterPowerPlants(powerPlants, filters = {}) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const { fuel = 'all', minCapacity = 0 } = filters;
+
+  return powerPlants.filter((plant) => {
+    const matchesCapacity = plant.capacity_mw >= minCapacity;
+    const matchesFuel = fuel === 'all' || plant.primary_fuel?.toLowerCase() === fuel.toLowerCase();
+
+    return matchesCapacity && matchesFuel;
+  });
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -56,6 +133,20 @@ function filterPowerPlants(powerPlants, filters = {}) {
  */
 function aggregatePlantsByCountry(filteredPlants) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  return filteredPlants.reduce((acc, plant) => {
+    const id = plant.country_id;
+    if (!id) return acc;
+
+    if (!acc[id]) {
+      acc[id] = { count: 0, capacity: 0 };
+    }
+    acc[id].count += 1;
+    acc[id].capacity += plant.capacity_mw;
+
+    return acc;
+  }, {});
+  // === END SAMPLE SOLUTION ===
 }
 
 export {
