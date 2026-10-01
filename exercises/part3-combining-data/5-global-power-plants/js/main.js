@@ -93,7 +93,7 @@ import {
   filterPowerPlants,
   aggregatePlantsByCountry,
 } from './power-plants.js';
-import { initMap } from './power-plants-map.js';
+import { initMap } from './power-plants-map-gl.js';
 import { initControls } from './power-plants-controls.js';
 
 let allPowerPlants = [];
