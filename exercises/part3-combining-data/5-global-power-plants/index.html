@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counting Power Plants by Country: Spatial Join</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <link rel="stylesheet" href="../../../common-components/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+                "@turf/turf": "https://cdn.jsdelivr.net/npm/@turf/turf@7/+esm",
+                "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm",
+                "@zip.js/zip.js": "https://cdn.jsdelivr.net/npm/@zip.js/zip.js/+esm"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Global Power Plants: Spatial Join</h1>
+        <p class="info">Counting and aggregating power plants by country using spatial joins with Turf.js</p>
+    </header>
+    <main>
+        <div class="sidebar-layout">
+            <aside class="sidebar">
+                <form id="plant-controls" class="controls">
+                    <h2>Filter Power Plants</h2>
+
+                    <div class="form-group">
+                        <label for="fuel-select">Primary Fuel Type:</label>
+                        <select id="fuel-select" name="fuel-select">
+                            <option value="all">All Fuels</option>
+                            <option value="Hydro">Hydro</option>
+                            <option value="Solar">Solar</option>
+                            <option value="Wind">Wind</option>
+                            <option value="Coal">Coal</option>
+                            <option value="Gas">Gas</option>
+                            <option value="Nuclear">Nuclear</option>
+                            <option value="Oil">Oil</option>
+                            <option value="Waste">Waste</option>
+                            <option value="Biomass">Biomass</option>
+                            <option value="Geothermal">Geothermal</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min-capacity-slider">
+                            Minimum Capacity (MW): <span id="capacity-value">0</span>
+                        </label>
+                        <input type="range" id="min-capacity-slider" name="min-capacity-slider" min="0" max="2000" step="50" value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="metric-select">Display Metric:</label>
+                        <select id="metric-select" name="metric-select">
+                            <option value="count">Power Plant Count</option>
+                            <option value="capacity">Total Capacity (MW)</option>
+                        </select>
+                    </div>
+
+                    <div class="count-display">
+                        <p>Showing <span id="plant-count">0</span> plants in <span id="country-count">0</span> countries</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar"></div>
+                        </div>
+                    </div>
+                </form>
+            </aside>
+
+            <section class="map-section">
+                <div id="map" class="map visualization-container"></div>
+                <div class="loading-overlay">
+                    <div class="loading-spinner">Loading data &amp; calculating spatial join...</div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>Data from <a href="https://datasets.wri.org/dataset/globalpowerplantdatabase" target="_blank" rel="noopener">World Resources Institute Global Power Plant Database</a> and <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>.</p>
+    </footer>
+</body>
+</html>

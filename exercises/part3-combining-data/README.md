@@ -45,6 +45,9 @@ This is the most advanced part, where you must perform a "join" by combining two
     * **Result:** A powerful visualization of global inequality in carbon emissions.
 
 5. **Counting Power Plants by Country (Spatial Join):** ⚡
+
+    [5-global-power-plants/](5-global-power-plants/)
+
     * **Goal:** Determine how many power plants from the Global Power Plant Database are located within each country.
     * **Skills:** This is a classic **spatial join**. Load the countries GeoJSON and the power plants data. Loop through every power plant, create a `turf.point` from its latitude and longitude, and loop through the countries to find which polygon the point falls inside using `turf.booleanPointInPolygon()`. When a match is found, increment the plant count for that country.
 
