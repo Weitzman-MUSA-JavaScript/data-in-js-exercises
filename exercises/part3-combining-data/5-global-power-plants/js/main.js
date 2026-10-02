@@ -11,9 +11,13 @@ You will implement the data retrieval, spatial join, and aggregation functions
 in `js/power-plants.js`:
 
 1. `loadCountries` (in `js/power-plants.js`):
-   Use `fetch` to retrieve the Natural Earth world countries GeoJSON
-   (`./data/countries.geojson`).
-   Return the array of country GeoJSON feature objects.
+   Natural Earth (http://www.naturalearthdata.com) "is a public domain map
+   dataset available at 1:10m, 1:50m and 1:110 million scales." The vector data
+   comes as ESRI shapefiles. For this repository, the `prep_natural_earth.py`
+   script was used to convert the shapefiles to GeoJSON (Note: you do not need
+   to run this yourself, it has already been run). Use `fetch` to retrieve the
+   Natural Earth world countries GeoJSON (`./data/countries.geojson`). Return
+   the array of country GeoJSON feature objects.
 
 2. `loadPowerPlants` (in `js/power-plants.js`):
    The Global Power Plant Database is distributed as a compressed zip file
