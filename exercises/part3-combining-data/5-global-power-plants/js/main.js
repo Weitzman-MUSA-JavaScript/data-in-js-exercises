@@ -20,11 +20,31 @@ in `js/power-plants.js`:
    the array of country GeoJSON feature objects.
 
 2. `loadPowerPlants` (in `js/power-plants.js`):
-   The Global Power Plant Database is distributed as a compressed zip file
-   (`./data/global_power_plants.zip`). Use `fetch` to get the file blob, extract
-   the CSV file using `@zip.js/zip.js`, and parse the CSV text into an array of
-   objects using `d3.csvParse`. Ensure capacity, latitude, and longitude are
-   parsed as numbers.
+   The Global Power Plant Database
+   (https://datasets.wri.org/datasets/global-power-plant-database) is
+   distributed as a compressed zip file. FOr this repository, the `prep_power_plants.py` script was used to download that zip file (`./data/global_power_plants.zip`), and to extract the CSV file from it (`./data/global_power_plant_database.csv`).
+   You can use `d3.csv` to load the CSV file directly.
+
+   Alternatively, you can use `fetch` to get the zip file data as a "blob"
+   (https://developer.mozilla.org/en-US/docs/Web/API/Blob), extract the CSV file
+   using `@zip.js/zip.js`, and parse the CSV text into an array of objects using
+   `d3.csvParse`. The general approach for extracting data from a zip file is:
+
+     const response = await fetch(url);
+     const blob = await response.blob();
+
+     const blobReader = new BlobReader(blob);  // Set up an object to read from the blob
+     const zipReader = new ZipReader(blobReader);  // Set up an object to read from the zip
+     const entries = await zipReader.getEntries();  // Get an array of entries in the zip file
+     const csvEntry = entries.find((entry) => entry.filename.endsWith('.csv'));  // Find the CSV file
+
+     const text = await csvEntry.getData(new TextWriter());  // Extract the CSV text from the entry
+     await zipReader.close();  // Close the zip reader
+
+     // Then you can do whatever you need with the text of the CSV file...
+
+   In either case, ensure capacity, latitude, and longitude are parsed from the
+   CSV as numbers.
 
 3. `joinPlantsToCountries` (in `js/power-plants.js`):
    Perform a spatial join between the power plants and the country polygons.
