@@ -3,7 +3,8 @@ import * as d3 from 'd3';
 import { BlobReader, ZipReader, TextWriter } from '@zip.js/zip.js';
 
 const COUNTRIES_DATA_URL = './data/countries.geojson';
-const POWER_PLANTS_DATA_URL = './data/global_power_plants.zip';
+const POWER_PLANTS_CSV_DATA_URL = './data/global_power_plant_database.csv';
+const POWER_PLANTS_ZIP_DATA_URL = './data/global_power_plants.zip';
 
 /**
  * Loads the Natural Earth world countries GeoJSON dataset.
