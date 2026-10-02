@@ -111,6 +111,14 @@ main {
   background-color: transparent;
 }
 
+.maplibregl-popup-close-button {
+  background-color: var(--color-secondary);
+}
+
+.maplibregl-popup-close-button:hover {
+  background-color: var(--color-background);
+}
+
 .visualization-container {
   height: 100%;
   width: 100%;

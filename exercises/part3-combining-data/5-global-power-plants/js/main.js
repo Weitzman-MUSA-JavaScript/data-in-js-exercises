@@ -76,6 +76,12 @@ in `js/power-plants.js`:
 The map rendering (`power-plants-map.js`), UI controls (`power-plants-controls.js`),
 and this orchestrator (`main.js`) manage the application state and map updates.
 
+NOTE: There is a Leaflet version of this map, and a MapLibre GL JS version as
+well. Once you've added data to the map, if you would like to see the MapLibre
+GL JS version, you can switch to it by updating line 94 below to:
+
+  import { initMap } from './power-plants-map-gl.js';
+
 */
 
 import {
