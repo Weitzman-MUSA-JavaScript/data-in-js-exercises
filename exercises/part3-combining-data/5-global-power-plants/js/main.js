@@ -78,9 +78,11 @@ and this orchestrator (`main.js`) manage the application state and map updates.
 
 NOTE: There is a Leaflet version of this map, and a MapLibre GL JS version as
 well. Once you've added data to the map, if you would like to see the MapLibre
-GL JS version, you can switch to it by updating line 94 below to:
+GL JS version, you can switch to it by updating line 96 below to:
 
   import { initMap } from './power-plants-map-gl.js';
+
+Try it out, and consider the pros and cons of this type of map display.
 
 */
 
