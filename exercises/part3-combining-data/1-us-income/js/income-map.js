@@ -25,6 +25,17 @@ import {
  */
 function getIncomeColor(income, incomeRange) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (income === null || income === undefined || isNaN(income) || income <= 0) {
+    return '#e0e0e0';
+  }
+
+  const colorScale = d3.scaleSequential(d3.interpolateBlues)
+    .domain(incomeRange)
+    .clamp(true);
+
+  return colorScale(income);
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -207,7 +218,10 @@ function initMap(options = {}) {
     outlineLayerGroup.addLayer(statesLayer);
 
     // Reset map view to national extent
-    map.setView([38, -96], 4);
+    if (countiesLayer.getBounds().isValid()) {
+      map.fitBounds(countiesLayer.getBounds(), { padding: [20, 20] });
+    }
+    // map.setView([38, -96], 4);
   }
 
   /**

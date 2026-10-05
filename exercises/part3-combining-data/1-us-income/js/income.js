@@ -57,6 +57,14 @@ async function fetchStateTractsGeoJSON(stateFips) {
  */
 async function fetchCountyIncomeData(apiKey) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!apiKey) {
+    throw new Error('A valid Census API key is required.');
+  }
+
+  const url = `${CENSUS_API_BASE}?get=NAME,B06011_001E&for=county:*&key=${apiKey}`;
+  return fetchJson(url);
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -68,6 +76,15 @@ async function fetchCountyIncomeData(apiKey) {
  */
 async function fetchTractIncomeData(stateFips, apiKey) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!apiKey) {
+    throw new Error('A valid Census API key is required.');
+  }
+
+  const fips = String(stateFips).padStart(2, '0');
+  const url = `${CENSUS_API_BASE}?get=NAME,B06011_001E&for=tract:*&in=state:${fips}&key=${apiKey}`;
+  return fetchJson(url);
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -94,6 +111,41 @@ async function fetchTractIncomeData(stateFips, apiKey) {
  */
 function createIncomeLookup(censusRows) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  const lookup = new Map();
+  if (!Array.isArray(censusRows) || censusRows.length < 2) {
+    return lookup;
+  }
+
+  // Row 0 is header: ['NAME', 'B06011_001E', 'state', 'county', ...]
+  const dataRows = censusRows.slice(1);
+
+  for (const row of dataRows) {
+    const rawIncome = row[1];
+    const incomeValue = rawIncome !== null && rawIncome !== undefined && rawIncome !== ''
+      ? Number(rawIncome)
+      : null;
+
+    // Filter out negative sentinel values used by Census for missing/suppressed data
+    const validIncome = (incomeValue !== null && incomeValue > 0) ? incomeValue : null;
+
+    // Construct the GEOID depending on whether it's county or tract level
+    let geoid = '';
+    if (row.length === 4) {
+      // County: state + county
+      geoid = `${row[2]}${row[3]}`;
+    } else if (row.length >= 5) {
+      // Tract: state + county + tract
+      geoid = `${row[2]}${row[3]}${row[4]}`;
+    }
+
+    if (geoid) {
+      lookup.set(geoid, validIncome);
+    }
+  }
+
+  return lookup;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
@@ -108,6 +160,26 @@ function createIncomeLookup(censusRows) {
  */
 function joinIncomeData(geojson, incomeLookup) {
   // ... Your code here ...
+  // === BEGIN SAMPLE SOLUTION ===
+  if (!geojson || !Array.isArray(geojson.features)) {
+    return geojson;
+  }
+
+  for (const feature of geojson.features) {
+    const geoidfq = feature.properties?.GEOIDFQ || '';
+    const match = geoidfq.match(/US(\d+)$/);
+    const geoid = match ? match[1] : geoidfq;
+
+    const income = incomeLookup.get(geoid) ?? null;
+    feature.properties = {
+      ...feature.properties,
+      income,
+      geoid,
+    };
+  }
+
+  return geojson;
+  // === END SAMPLE SOLUTION ===
 }
 
 /**
