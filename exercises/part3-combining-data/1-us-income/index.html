@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choropleth Map of Median Income: Attribute Join</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="../../../common-components/style.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
+                "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Median Household Income across the US</h1>
+        <p>Explore median household income by county and census tract using data from the US Census Bureau.</p>
+
+        <nav aria-label="Breadcrumb" id="breadcrumb-nav">
+            <ol id="breadcrumbs">
+                <li aria-current="page">United States</li>
+            </ol>
+        </nav>
+    </header>
+
+    <main>
+        <div class="relative-container map-wrapper">
+            <div id="map" class="map visualization-container"></div>
+            <div id="loading-overlay" class="loading-overlay hidden">
+                <div class="loading-spinner">Loading income data...</div>
+            </div>
+        </div>
+
+        <dialog id="censuskey-dialog">
+            <form id="censuskey-form" method="dialog">
+                <h2>Enter US Census API Key</h2>
+                <p>This exercise requires an API key from the US Census Bureau to fetch median household income data. You can request a free API key at <a href="https://api.census.gov/data/key_signup.html" target="_blank" rel="noopener">api.census.gov/data/key_signup.html</a> (use "University of Pennsylvania" as the organization name).</p>
+                <label for="censuskey-input">Census API Key:</label>
+                <input type="text" id="censuskey-input" name="censuskey" required>
+                <button type="submit">Save</button>
+            </form>
+        </dialog>
+    </main>
+
+    <footer>
+        <p>Data from the <a href="https://www.census.gov/data/developers/data-sets/acs-5year.html" target="_blank" rel="noopener">US Census Bureau (ACS 5-Year Estimates)</a>.</p>
+        <p>Census API Key: <code id="censuskey-display"></code> <button id="show-censuskey-dialog-button" type="button">Update API Key</button></p>
+    </footer>
+</body>
+</html>
