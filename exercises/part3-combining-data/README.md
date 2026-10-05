@@ -19,6 +19,9 @@ This is the most advanced part, where you must perform a "join" by combining two
 ### **Exercise Ideas**
 
 1. **Choropleth Map of Median Income:**
+
+    [1-us-income/](1-us-income/)
+
     * **Goal:** Create a choropleth map showing the median household income at different US Census geography levels. 🗺️
 
       The map should start showing the entire US, with income data by county and with each state outlined with a thick outline (i.e., use the `us_counties_simplified.geojson` file and the `us_states_simplified.geojson` file). When you click on a state, the map should zoom in to that state and update to show income by census tract (using the relevant `state_{state_fips_code}_tracts_simplified.geojson` file for that state, with each of the counties outlined with a thick outline).
