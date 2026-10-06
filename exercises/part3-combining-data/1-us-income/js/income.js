@@ -68,6 +68,46 @@ async function fetchTractIncomeData(stateFips, apiKey) {
   // ... Your code here ...
 }
 
+/**
+ * Creates a Map lookup of median income by geography ID from Census API
+ * results. Rearranging data in this way allows us to much more quickly and
+ * efficiently access income values for specific geographies. Note that we could
+ * use a plain JavaScript object instead of a Map, but a Map provides a number
+ * of benefits for this type of use:
+ *
+ * - Objects can only use strings or symbols as keys, whereas Maps can use any
+ *   value type as a key.
+ * - Maps maintain the insertion order of keys.
+ * - Maps allow you to check the number of entries in "constant time" using the
+ *   `size` property, unlike plain objects.
+ * - Map provides a `groupBy` function for for grouping elements of an array by
+ *   key function.
+ *
+ * In this specific case, either Map or a simple object will do, but in general
+ * it's worthwhile to be familiar with the API of Map objects.
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#constructor
+ *
+ * @param {Array<Array<string>>} censusRows - Array of Census API rows (including header).
+ * @returns {Map<string, number|null>} Map where key is the GEOID and value is income.
+ */
+function createIncomeLookup(censusRows) {
+  // ... Your code here ...
+}
+
+/**
+ * Updates a GeoJSON FeatureCollection by joining income data into each
+ * feature's properties. Since both datasets have a consistent key available
+ * (the GEOID), we can efficiently join the income data to the GeoJSON features
+ * without having to resort to more complex spatial joins or lookups.
+ *
+ * @param {object} geojson - GeoJSON FeatureCollection.
+ * @param {Map<string, number|null>} incomeLookup - Map of GEOID to income.
+ * @returns {object} The mutated GeoJSON FeatureCollection with `income` added to properties.
+ */
+function joinIncomeData(geojson, incomeLookup) {
+  // ... Your code here ...
+}
+
 export {
   fetchJson,
   fetchCountiesGeoJSON,
@@ -75,4 +115,6 @@ export {
   fetchStateTractsGeoJSON,
   fetchCountyIncomeData,
   fetchTractIncomeData,
+  createIncomeLookup,
+  joinIncomeData,
 };

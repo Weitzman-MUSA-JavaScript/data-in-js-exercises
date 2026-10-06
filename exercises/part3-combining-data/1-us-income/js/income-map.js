@@ -69,27 +69,6 @@ function getCountyOutlineStyle() {
 }
 
 /**
- * Creates a Map lookup of median income by geography ID from Census API results.
- *
- * @param {Array<Array<string>>} censusRows - Array of Census API rows (including header).
- * @returns {Map<string, number|null>} Map where key is the GEOID and value is income.
- */
-function createIncomeLookup(censusRows) {
-  // ... Your code here ...
-}
-
-/**
- * Updates a GeoJSON FeatureCollection by joining income data into each feature's properties.
- *
- * @param {object} geojson - GeoJSON FeatureCollection.
- * @param {Map<string, number|null>} incomeLookup - Map of GEOID to income.
- * @returns {object} The mutated GeoJSON FeatureCollection with `income` added to properties.
- */
-function joinIncomeData(geojson, incomeLookup) {
-  // ... Your code here ...
-}
-
-/**
  * Updates the legend control with income ranges.
  *
  * @param {L.Control} legendControl - Leaflet legend control instance.
@@ -178,8 +157,6 @@ function initMap(options = {}) {
     getFeatureStyle,
     getStateOutlineStyle,
     getCountyOutlineStyle,
-    createIncomeLookup,
-    joinIncomeData,
   };
 }
 
@@ -189,7 +166,5 @@ export {
   getFeatureStyle,
   getStateOutlineStyle,
   getCountyOutlineStyle,
-  createIncomeLookup,
-  joinIncomeData,
   updateLegend,
 };

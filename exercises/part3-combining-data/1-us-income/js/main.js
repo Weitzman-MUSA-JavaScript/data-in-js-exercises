@@ -24,7 +24,7 @@ implement the key data fetching, joining, and styling functions:
      `https://api.census.gov/data/2023/acs/acs5?get=NAME,B06011_001E&for=tract:*&in=state:${stateFips}&key=${apiKey}`
    Parse and return the JSON array of rows.
 
-3. `createIncomeLookup` (in `js/income-map.js`):
+3. `createIncomeLookup` (in `js/income.js`):
    Convert the Census API rows array into a JavaScript `Map` where:
    - Key: The geographic ID string (5-digit GEOID `${state}${county}` for counties,
      or 11-digit GEOID `${state}${county}${tract}` for tracts).
@@ -32,7 +32,7 @@ implement the key data fetching, joining, and styling functions:
    Note: Census API uses negative numbers (e.g. -666666666) or null/empty strings
    for suppressed or missing data; convert these to `null`.
 
-4. `joinIncomeData` (in `js/income-map.js`):
+4. `joinIncomeData` (in `js/income.js`):
    Perform the attribute join! Iterate over the features of the GeoJSON
    FeatureCollection. Extract the numeric GEOID from each feature's `GEOIDFQ`
    property (e.g., `"0500000US42001"` -> `"42001"`, or `"1400000US42001030101"` ->
@@ -42,7 +42,7 @@ implement the key data fetching, joining, and styling functions:
 5. `getIncomeColor` (in `js/income-map.js`):
    Return a color string for a given median household income value using D3's color
    interpolation functions (such as `d3.interpolateBlues` or a sequential scale like
-   `d3.scaleSequential(d3.interpolateBlues).domain([20000, 120000])`) rather than hardcoding
+   `d3.scaleSequential(d3.interpolateBlues).domain(incomeRange)`) rather than hardcoding
    color thresholds. Return a neutral gray (`#e0e0e0`) if the income value is null, undefined,
    or missing.
 
@@ -57,8 +57,6 @@ import {
   getFeatureStyle,
   getStateOutlineStyle,
   getCountyOutlineStyle,
-  createIncomeLookup,
-  joinIncomeData,
 } from './income-map.js';
 
 import {
@@ -67,6 +65,8 @@ import {
   fetchStateTractsGeoJSON,
   fetchCountyIncomeData,
   fetchTractIncomeData,
+  createIncomeLookup,
+  joinIncomeData,
 } from './income.js';
 
 import {
