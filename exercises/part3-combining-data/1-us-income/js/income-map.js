@@ -128,6 +128,7 @@ function initMap(options = {}) {
     minZoom: 3,
     maxZoom: 15,
     zoomSnap: 0,
+    preferCanvas: true,
   });
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
