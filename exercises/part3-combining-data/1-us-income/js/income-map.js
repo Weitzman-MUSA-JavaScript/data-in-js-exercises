@@ -25,12 +25,11 @@ function getIncomeColor(income, incomeRange) {
  * Styles a polygon feature based on its median income property.
  *
  * @param {object} feature - GeoJSON feature.
- * @param {Array<object>} allFeatures - Array of all GeoJSON features in the current layer, used to determine the income range for color scaling.
+ * @param {Array<number>} incomeRange - Array of two numbers [minIncome, maxIncome] representing the income range for color scaling.
  * @returns {object} Leaflet path styling options.
  */
-function getFeatureStyle(feature, allFeatures) {
+function getFeatureStyle(feature, incomeRange) {
   const income = feature.properties?.income ?? null;
-  const incomeRange = d3.extent(allFeatures, (f) => f.properties?.income ?? null);
   return {
     fillColor: getIncomeColor(income, incomeRange),
     fillOpacity: 0.8,
