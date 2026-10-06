@@ -124,6 +124,28 @@ function getIncomeRange(features) {
   return d3.extent(nonNullIncomes);
 }
 
+/**
+ * Extracts 2-digit state FIPS code from a GEOIDFQ string.
+ *
+ * @param {string} geoidfq - e.g. "0400000US36" or "0500000US42001".
+ * @returns {string} 2-digit state FIPS code.
+ */
+function getStateFipsFromGeoidfq(geoidfq) {
+  const match = (geoidfq || '').match(/US(\d{2})/);
+  return match ? match[1] : '';
+}
+
+/**
+ * Extracts 5-digit county GEOID from a GEOIDFQ string.
+ *
+ * @param {string} geoidfq - e.g. "0500000US42001" or "1400000US42001030101".
+ * @returns {string} 5-digit state+county GEOID.
+ */
+function getCountyGeoidFromGeoidfq(geoidfq) {
+  const match = (geoidfq || '').match(/US(\d{5})/);
+  return match ? match[1] : '';
+}
+
 export {
   fetchJson,
   fetchCountiesGeoJSON,
@@ -134,4 +156,6 @@ export {
   createIncomeLookup,
   joinIncomeData,
   getIncomeRange,
+  getStateFipsFromGeoidfq,
+  getCountyGeoidFromGeoidfq,
 };

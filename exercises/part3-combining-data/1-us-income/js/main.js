@@ -54,9 +54,6 @@ entire US and click into individual states and counties!
 
 import {
   initMap,
-  getFeatureStyle,
-  getStateOutlineStyle,
-  getCountyOutlineStyle,
 } from './income-map.js';
 
 import {
@@ -67,7 +64,8 @@ import {
   fetchTractIncomeData,
   createIncomeLookup,
   joinIncomeData,
-  getIncomeRange,
+  getStateFipsFromGeoidfq,
+  getCountyGeoidFromGeoidfq,
 } from './income.js';
 
 import {
@@ -104,7 +102,23 @@ const loadingOverlay = document.getElementById('loading-overlay');
 
 // Initialize Map
 const mapController = initMap();
-const { map, dataLayerGroup, outlineLayerGroup } = mapController;
+const {
+  dataLayerGroup,
+  outlineLayerGroup,
+  showNationalData,
+  showStateData,
+  showCountyData,
+} = mapController;
+
+dataLayerGroup.on('click:state', (evt) => {
+  const { stateFips, stateName } = evt;
+  showStateView(stateFips, stateName);
+});
+
+dataLayerGroup.on('click:county', (evt) => {
+  const { stateFips, stateName, countyGeoid, countyName } = evt;
+  showCountyView(stateFips, stateName, countyGeoid, countyName);
+});
 
 /**
  * Shows or hides the loading overlay spinner.
@@ -163,28 +177,6 @@ function handleBreadcrumbClick(level) {
 }
 
 /**
- * Extracts 2-digit state FIPS code from a GEOIDFQ string.
- *
- * @param {string} geoidfq - e.g. "0400000US36" or "0500000US42001".
- * @returns {string} 2-digit state FIPS code.
- */
-function getStateFipsFromGeoidfq(geoidfq) {
-  const match = (geoidfq || '').match(/US(\d{2})/);
-  return match ? match[1] : '';
-}
-
-/**
- * Extracts 5-digit county GEOID from a GEOIDFQ string.
- *
- * @param {string} geoidfq - e.g. "0500000US42001" or "1400000US42001030101".
- * @returns {string} 5-digit state+county GEOID.
- */
-function getCountyGeoidFromGeoidfq(geoidfq) {
-  const match = (geoidfq || '').match(/US(\d{5})/);
-  return match ? match[1] : '';
-}
-
-/**
  * Finds the state name for a given 2-digit state FIPS code.
  *
  * @param {string} fips - Two-digit state FIPS code.
@@ -194,31 +186,6 @@ function getStateNameByFips(fips) {
   if (!app.statesGeojson) return `State ${fips}`;
   const feat = app.statesGeojson.features.find((f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === fips);
   return feat?.properties?.NAME || `State ${fips}`;
-}
-
-/**
- * Finds the county name for a given 5-digit county GEOID.
- *
- * @param {string} countyGeoid - 5-digit county GEOID.
- * @returns {string} County name or fallback.
- */
-function getCountyNameByGeoid(countyGeoid) {
-  if (!app.countiesGeojson) return `County ${countyGeoid}`;
-  const feat = app.countiesGeojson.features.find((f) => f.properties?.geoid === countyGeoid || f.properties?.GEOIDFQ?.endsWith(countyGeoid));
-  return feat?.properties?.NAMELSAD || feat?.properties?.NAME || `County ${countyGeoid}`;
-}
-
-/**
- * Formats dollar income values for popups and tooltips.
- *
- * @param {number|null} income - Median household income.
- * @returns {string} Formatted string.
- */
-function formatIncome(income) {
-  if (income === null || income === undefined || isNaN(income) || income <= 0) {
-    return 'No data available';
-  }
-  return `$${income.toLocaleString()}`;
 }
 
 /**
@@ -260,46 +227,8 @@ async function showNationalView() {
       joinIncomeData(app.countiesGeojson, app.countyIncomeLookup);
     }
 
-    // 3. Render counties choropleth layer
-    const incomeRange = getIncomeRange(app.countiesGeojson.features);
-    const countiesLayer = L.geoJSON(app.countiesGeojson, {
-      style: (feature) => getFeatureStyle(feature, incomeRange),
-      onEachFeature: (feature, layer) => {
-        const countyName = feature.properties?.NAMELSAD || feature.properties?.NAME || 'County';
-        const income = feature.properties?.income;
-        const stateFips = getStateFipsFromGeoidfq(feature.properties?.GEOIDFQ);
-        const stateName = getStateNameByFips(stateFips);
-
-        layer.bindTooltip(
-          `<strong>${countyName}, ${stateName}</strong><br>Median Income: ${formatIncome(income)}`,
-          { sticky: true },
-        );
-
-        layer.on('click', () => {
-          showStateView(stateFips, stateName);
-        });
-      },
-    });
-    dataLayerGroup.addLayer(countiesLayer);
-
-    // 4. Render state outlines layer (thick borders)
-    const statesLayer = L.geoJSON(app.statesGeojson, {
-      style: getStateOutlineStyle,
-      interactive: true,
-      onEachFeature: (feature, layer) => {
-        const stateName = feature.properties?.NAME || 'State';
-        const stateFips = getStateFipsFromGeoidfq(feature.properties?.GEOIDFQ);
-
-        layer.on('click', (evt) => {
-          L.DomEvent.stopPropagation(evt);
-          showStateView(stateFips, stateName);
-        });
-      },
-    });
-    outlineLayerGroup.addLayer(statesLayer);
-
-    // Reset map view to national extent
-    map.setView([38, -96], 4);
+    // 3. Render counties choropleth layer and state outlines layer (thick borders)
+    showNationalData(app.statesGeojson, app.countiesGeojson);
   } catch (error) {
     console.error('Error rendering national view:', error);
     // alert(`Error loading US income data: ${error.message}`);
@@ -353,57 +282,8 @@ async function showStateView(stateFips, stateName) {
       joinIncomeData(tractsGeojson, lookup);
     }
 
-    // 3. Render tracts choropleth layer
-    const incomeRange = getIncomeRange(tractsGeojson.features);
-    const tractsLayer = L.geoJSON(tractsGeojson, {
-      style: (feature) => getFeatureStyle(feature, incomeRange),
-      onEachFeature: (feature, layer) => {
-        const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
-        const income = feature.properties?.income;
-        const countyGeoid = getCountyGeoidFromGeoidfq(feature.properties?.GEOIDFQ);
-        const countyName = getCountyNameByGeoid(countyGeoid);
-
-        layer.bindTooltip(
-          `<strong>${tractName}</strong> (${countyName})<br>Median Income: ${formatIncome(income)}`,
-          { sticky: true },
-        );
-
-        layer.on('click', () => {
-          showCountyView(stateFips, app.currentStateName, countyGeoid, countyName);
-        });
-      },
-    });
-    dataLayerGroup.addLayer(tractsLayer);
-
-    // 4. Render county outlines within this state
-    if (app.countiesGeojson) {
-      const stateCounties = {
-        type: 'FeatureCollection',
-        features: app.countiesGeojson.features.filter(
-          (f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === stateFips,
-        ),
-      };
-
-      const countyOutlinesLayer = L.geoJSON(stateCounties, {
-        style: getCountyOutlineStyle,
-        interactive: true,
-        onEachFeature: (feature, layer) => {
-          const countyGeoid = getCountyGeoidFromGeoidfq(feature.properties?.GEOIDFQ);
-          const countyName = feature.properties?.NAMELSAD || feature.properties?.NAME || 'County';
-
-          layer.on('click', (evt) => {
-            L.DomEvent.stopPropagation(evt);
-            showCountyView(stateFips, app.currentStateName, countyGeoid, countyName);
-          });
-        },
-      });
-      outlineLayerGroup.addLayer(countyOutlinesLayer);
-    }
-
-    // Zoom map to fit the state tracts
-    if (tractsLayer.getBounds().isValid()) {
-      map.fitBounds(tractsLayer.getBounds(), { padding: [20, 20] });
-    }
+    // 3. Render tracts choropleth and county outlines within the state
+    showStateData(app.currentStateName, stateFips, app.countiesGeojson, tractsGeojson);
   } catch (error) {
     console.error('Error rendering state view:', error);
     alert(`Error loading state data: ${error.message}`);
@@ -440,7 +320,11 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
     return;
   }
 
-  // Filter tracts to just this county
+  // Filter counties and tracts to just this county
+  const countyGeojson = app.countiesGeojson.features.find(
+    (f) => getCountyGeoidFromGeoidfq(f.properties?.GEOIDFQ) === countyGeoid,
+  );
+
   const countyTracts = {
     type: 'FeatureCollection',
     features: stateTracts.features.filter(
@@ -448,48 +332,8 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
     ),
   };
 
-  // Render county tracts choropleth
-  const incomeRange = getIncomeRange(countyTracts.features);
-  const countyTractsLayer = L.geoJSON(countyTracts, {
-    style: (feature) => getFeatureStyle(feature, incomeRange),
-    onEachFeature: (feature, layer) => {
-      const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
-      const income = feature.properties?.income;
-
-      layer.bindTooltip(
-        `<strong>${tractName}</strong><br>Median Income: ${formatIncome(income)}`,
-        { sticky: true },
-      );
-    },
-  });
-  dataLayerGroup.addLayer(countyTractsLayer);
-
-  // Render thick boundary for this county
-  if (app.countiesGeojson) {
-    const singleCounty = {
-      type: 'FeatureCollection',
-      features: app.countiesGeojson.features.filter(
-        (f) => getCountyGeoidFromGeoidfq(f.properties?.GEOIDFQ) === countyGeoid,
-      ),
-    };
-
-    const singleCountyLayer = L.geoJSON(singleCounty, {
-      style: () => ({
-        fillColor: 'transparent',
-        fillOpacity: 0,
-        weight: 3,
-        color: '#990000', // Highlight county with UPenn red accent
-        opacity: 1,
-      }),
-      interactive: false,
-    });
-    outlineLayerGroup.addLayer(singleCountyLayer);
-  }
-
-  // Zoom map to fit the county
-  if (countyTractsLayer.getBounds().isValid()) {
-    map.fitBounds(countyTractsLayer.getBounds(), { padding: [20, 20] });
-  }
+  // Render the county view using the filtered tracts
+  showCountyData(countyGeojson, countyTracts);
 }
 
 // Initialize API key handlers and initial view

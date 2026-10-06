@@ -5,6 +5,12 @@
 import 'leaflet';
 import * as d3 from 'd3';
 
+import {
+  getIncomeRange,
+  getStateFipsFromGeoidfq,
+  getCountyGeoidFromGeoidfq,
+} from './income.js';
+
 /* global L */
 
 /**
@@ -65,6 +71,19 @@ function getCountyOutlineStyle() {
     color: '#444444',
     opacity: 0.85,
   };
+}
+
+/**
+ * Formats dollar income values for popups and tooltips.
+ *
+ * @param {number|null} income - Median household income.
+ * @returns {string} Formatted string.
+ */
+function formatIncome(income) {
+  if (income === null || income === undefined || isNaN(income) || income <= 0) {
+    return 'No data available';
+  }
+  return `$${income.toLocaleString()}`;
 }
 
 /**
@@ -147,15 +166,161 @@ function initMap(options = {}) {
   };
   legend.addTo(map);
 
+  /**
+   * Display the national-level data on the map, including counties choropleth and state outlines.
+   *
+   * @param {object} statesGeojson - GeoJSON object containing all US state shapes.
+   * @param {object} countiesGeojson - GeoJSON object containing all US county shapes.
+   */
+  function showNationalData(statesGeojson, countiesGeojson) {
+    // Render counties choropleth layer
+    const incomeRange = getIncomeRange(countiesGeojson.features);
+    const countiesLayer = L.geoJSON(countiesGeojson, {
+      style: (feature) => getFeatureStyle(feature, incomeRange),
+      onEachFeature: (feature, layer) => {
+        const countyName = feature.properties?.NAMELSAD || feature.properties?.NAME || 'County';
+        const income = feature.properties?.income;
+        const stateFips = getStateFipsFromGeoidfq(feature.properties?.GEOIDFQ);
+        const stateFeature = statesGeojson.features.find((f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === stateFips);
+        const stateName = stateFeature?.properties?.NAME || 'State';
+
+        layer.bindTooltip(
+          `<strong>${countyName}, ${stateName}</strong><br>Median Income: ${formatIncome(income)}`,
+          { sticky: true },
+        );
+
+        layer.on('click', () => {
+          dataLayerGroup.fire('click:state', {
+            stateFips,
+            stateName,
+          });
+        });
+      },
+    });
+    dataLayerGroup.addLayer(countiesLayer);
+
+    // Render state outlines layer (thick borders)
+    const statesLayer = L.geoJSON(statesGeojson, {
+      style: getStateOutlineStyle,
+      interactive: false,
+    });
+    outlineLayerGroup.addLayer(statesLayer);
+
+    // Reset map view to national extent
+    map.setView([38, -96], 4);
+  }
+
+  /**
+   * Displays the state-level data on the map, including tracts choropleth and county outlines.
+   *
+   * @param {string} stateName - Name of the state.
+   * @param {string} stateFips - Two-digit state FIPS code.
+   * @param {object} countiesGeojson - GeoJSON object containing all counties in the state.
+   * @param {object} tractsGeojson - GeoJSON object containing all tracts in the state.
+   */
+  function showStateData(stateName, stateFips, countiesGeojson, tractsGeojson) {
+    // Render tracts choropleth layer
+    const incomeRange = getIncomeRange(tractsGeojson.features);
+    const tractsLayer = L.geoJSON(tractsGeojson, {
+      style: (feature) => getFeatureStyle(feature, incomeRange),
+      onEachFeature: (feature, layer) => {
+        const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
+        const income = feature.properties?.income;
+        const countyGeoid = getCountyGeoidFromGeoidfq(feature.properties?.GEOIDFQ);
+        const countyFeature = countiesGeojson.features.find((f) => f.properties?.geoid === countyGeoid || f.properties?.GEOIDFQ?.endsWith(countyGeoid));
+        const countyName = countyFeature?.properties?.NAMELSAD || countyFeature?.properties?.NAME || `County ${countyGeoid}`;
+
+        layer.bindTooltip(
+          `<strong>${tractName}</strong> (${countyName})<br>Median Income: ${formatIncome(income)}`,
+          { sticky: true },
+        );
+
+        layer.on('click', () => {
+          dataLayerGroup.fire('click:county', {
+            stateFips,
+            stateName,
+            countyGeoid,
+            countyName,
+          });
+        });
+      },
+    });
+    dataLayerGroup.addLayer(tractsLayer);
+
+    // Render county outlines within this state
+    if (countiesGeojson) {
+      const stateCounties = {
+        type: 'FeatureCollection',
+        features: countiesGeojson.features.filter(
+          (f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === stateFips,
+        ),
+      };
+
+      const countyOutlinesLayer = L.geoJSON(stateCounties, {
+        style: getCountyOutlineStyle,
+        interactive: false,
+      });
+      outlineLayerGroup.addLayer(countyOutlinesLayer);
+    }
+
+    // Zoom map to fit the state tracts
+    if (tractsLayer.getBounds().isValid()) {
+      map.fitBounds(tractsLayer.getBounds(), { padding: [20, 20] });
+    }
+  }
+
+  /**
+   * Displays the county-level data on the map, including tracts choropleth and county boundary.
+   *
+   * @param {object} countyGeojson - GeoJSON Feature object for the specific county.
+   * @param {object} tractsGeojson - GeoJSON FeatureCollection object containing all tracts in the county.
+   */
+  function showCountyData(countyGeojson, tractsGeojson) {
+    // Render county tracts choropleth
+    const incomeRange = getIncomeRange(tractsGeojson.features);
+    const countyTractsLayer = L.geoJSON(tractsGeojson, {
+      style: (feature) => getFeatureStyle(feature, incomeRange),
+      onEachFeature: (feature, layer) => {
+        const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
+        const income = feature.properties?.income;
+
+        layer.bindTooltip(
+          `<strong>${tractName}</strong><br>Median Income: ${formatIncome(income)}`,
+          { sticky: true },
+        );
+      },
+    });
+    dataLayerGroup.addLayer(countyTractsLayer);
+
+    // Render thick boundary for this county
+    if (countyGeojson) {
+      const singleCountyLayer = L.geoJSON(countyGeojson, {
+        style: () => ({
+          fillColor: 'transparent',
+          fillOpacity: 0,
+          weight: 3,
+          color: '#990000', // Highlight county with UPenn red accent
+          opacity: 1,
+        }),
+        interactive: false,
+      });
+      outlineLayerGroup.addLayer(singleCountyLayer);
+    }
+
+    // Zoom map to fit the county
+    if (countyTractsLayer.getBounds().isValid()) {
+      map.fitBounds(countyTractsLayer.getBounds(), { padding: [20, 20] });
+    }
+  }
+
   return {
     map,
     dataLayerGroup,
     outlineLayerGroup,
     legend,
-    getIncomeColor,
-    getFeatureStyle,
-    getStateOutlineStyle,
-    getCountyOutlineStyle,
+    showNationalData,
+    showStateData,
+    showCountyData,
   };
 }
 
