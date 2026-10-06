@@ -2,6 +2,8 @@
  * Module for fetching Census GeoJSON and demographic data from the US Census API.
  */
 
+import * as d3 from 'd3';
+
 const CENSUS_API_BASE = 'https://api.census.gov/data/2023/acs/acs5';
 
 /**
@@ -108,6 +110,20 @@ function joinIncomeData(geojson, incomeLookup) {
   // ... Your code here ...
 }
 
+/**
+ * Computes the range of income values (minimum and maximum) from an array of GeoJSON features.
+ *
+ * @param {Array<object>} features - Array of GeoJSON features.
+ * @returns {[number, number]} Array containing the minimum and maximum income values.
+ */
+function getIncomeRange(features) {
+  // Filter out null incomes, just in case.
+  const nonNullIncomes = features
+    .map((feature) => feature.properties?.income)
+    .filter((income) => !!income || income === 0);
+  return d3.extent(nonNullIncomes);
+}
+
 export {
   fetchJson,
   fetchCountiesGeoJSON,
@@ -117,4 +133,5 @@ export {
   fetchTractIncomeData,
   createIncomeLookup,
   joinIncomeData,
+  getIncomeRange,
 };

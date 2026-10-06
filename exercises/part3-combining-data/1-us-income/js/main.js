@@ -67,6 +67,7 @@ import {
   fetchTractIncomeData,
   createIncomeLookup,
   joinIncomeData,
+  getIncomeRange,
 } from './income.js';
 
 import {
@@ -74,6 +75,10 @@ import {
   initCensusKey,
   showCensusApiKeyDialog,
 } from './census-key.js';
+
+import {
+  htmlToElement,
+} from './html-utils.js';
 
 /* global L */
 
@@ -126,21 +131,18 @@ function updateBreadcrumbs(items) {
 
   items.forEach((item, index) => {
     const isLast = index === items.length - 1;
-    const li = document.createElement('li');
+    const html = isLast
+      ? `<li aria-current="page">${item.label}</li>`
+      : `<li><a href="#" data-level="${item.level}">${item.label}</a></li>`;
 
-    if (isLast) {
-      li.setAttribute('aria-current', 'page');
-      li.textContent = item.label;
-    } else {
-      const a = document.createElement('a');
-      a.href = '#';
-      a.textContent = item.label;
-      a.dataset.level = item.level;
+    const li = htmlToElement(html);
+    const a = li.querySelector('a');
+
+    if (a) {
       a.addEventListener('click', (evt) => {
         evt.preventDefault();
         handleBreadcrumbClick(item.level);
       });
-      li.appendChild(a);
     }
 
     breadcrumbsList.appendChild(li);
@@ -259,8 +261,9 @@ async function showNationalView() {
     }
 
     // 3. Render counties choropleth layer
+    const incomeRange = getIncomeRange(app.countiesGeojson.features);
     const countiesLayer = L.geoJSON(app.countiesGeojson, {
-      style: (feature) => getFeatureStyle(feature, app.countiesGeojson.features),
+      style: (feature) => getFeatureStyle(feature, incomeRange),
       onEachFeature: (feature, layer) => {
         const countyName = feature.properties?.NAMELSAD || feature.properties?.NAME || 'County';
         const income = feature.properties?.income;
@@ -351,8 +354,9 @@ async function showStateView(stateFips, stateName) {
     }
 
     // 3. Render tracts choropleth layer
+    const incomeRange = getIncomeRange(tractsGeojson.features);
     const tractsLayer = L.geoJSON(tractsGeojson, {
-      style: (feature) => getFeatureStyle(feature, tractsGeojson.features),
+      style: (feature) => getFeatureStyle(feature, incomeRange),
       onEachFeature: (feature, layer) => {
         const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
         const income = feature.properties?.income;
@@ -445,8 +449,9 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
   };
 
   // Render county tracts choropleth
+  const incomeRange = getIncomeRange(countyTracts.features);
   const countyTractsLayer = L.geoJSON(countyTracts, {
-    style: (feature) => getFeatureStyle(feature, countyTracts.features),
+    style: (feature) => getFeatureStyle(feature, incomeRange),
     onEachFeature: (feature, layer) => {
       const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
       const income = feature.properties?.income;
