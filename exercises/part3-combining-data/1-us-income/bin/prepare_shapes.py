@@ -20,7 +20,7 @@ WGS84_CRS = 'EPSG:4326'
 RELEVANT_COLUMNS = ['NAME', 'NAMELSAD', 'GEOIDFQ', 'geometry']
 
 
-def download_and_simplify_state_shapes(output_filepath='us_states_simplified.geojson', tolerance=2000):
+def download_and_simplify_state_shapes(output_filepath='us_states_simplified.geojson', tolerance=1000):
     tmp_download_path = TMP_DIR / 'us_states.zip'
 
     if not tmp_download_path.exists():
@@ -30,12 +30,12 @@ def download_and_simplify_state_shapes(output_filepath='us_states_simplified.geo
 
     gdf = gpd.read_file(tmp_download_path)
     gdf_simplified = gdf.drop(columns=gdf.columns.difference(RELEVANT_COLUMNS), errors='ignore')
-    gdf_simplified.geometry = gdf.geometry.to_crs(US_METERS_CRS).simplify(tolerance).to_crs(WGS84_CRS).set_precision(grid_size=0.0001)
+    gdf_simplified.geometry = gdf.geometry.to_crs(US_METERS_CRS).simplify(tolerance).to_crs(WGS84_CRS).set_precision(grid_size=0.01)
     gdf_simplified.to_file(DATA_DIR / output_filepath, driver='GeoJSON')
     print(f"Simplified state shapes saved to {output_filepath}")
 
 
-def download_and_simplify_county_shapes(output_filepath='us_counties_simplified.geojson', tolerance=1000):
+def download_and_simplify_county_shapes(output_filepath='us_counties_simplified.geojson', tolerance=200):
     tmp_download_path = TMP_DIR / 'us_counties.zip'
 
     if not tmp_download_path.exists():
@@ -45,12 +45,12 @@ def download_and_simplify_county_shapes(output_filepath='us_counties_simplified.
 
     gdf = gpd.read_file(tmp_download_path)
     gdf_simplified = gdf.drop(columns=gdf.columns.difference(RELEVANT_COLUMNS))
-    gdf_simplified.geometry = gdf.geometry.to_crs(US_METERS_CRS).simplify(tolerance).to_crs(WGS84_CRS).set_precision(grid_size=0.0001)
+    gdf_simplified.geometry = gdf.geometry.to_crs(US_METERS_CRS).simplify(tolerance).to_crs(WGS84_CRS).set_precision(grid_size=0.001)
     gdf_simplified.to_file(DATA_DIR / output_filepath, driver='GeoJSON')
     print(f"Simplified county shapes saved to {output_filepath}")
 
 
-def download_and_simplify_tract_shapes(output_filepath_t='state_{state_fips_code}_tracts_simplified.geojson', tolerance=500):
+def download_and_simplify_tract_shapes(output_filepath_t='state_{state_fips_code}_tracts_simplified.geojson', tolerance=30):
     for state_fips_code in STATE_FIPS_CODES:
         url = TRACT_SHAPEFILE_URL_T.format(state_fips_code=state_fips_code)
         output_filepath = output_filepath_t.format(state_fips_code=state_fips_code)
