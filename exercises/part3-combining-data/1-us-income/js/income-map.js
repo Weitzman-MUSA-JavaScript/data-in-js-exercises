@@ -14,9 +14,10 @@ import * as d3 from 'd3';
  * if income is null, undefined, NaN, or non-positive.
  *
  * @param {number|null} income - Median household income in dollars.
+ * @param {Array<number>} incomeRange - Array of two numbers [minIncome, maxIncome] representing the income range for color scaling.
  * @returns {string} Hex or RGB color string.
  */
-function getIncomeColor(income) {
+function getIncomeColor(income, incomeRange) {
   // ... Your code here ...
 }
 
@@ -24,16 +25,16 @@ function getIncomeColor(income) {
  * Styles a polygon feature based on its median income property.
  *
  * @param {object} feature - GeoJSON feature.
+ * @param {Array<object>} allFeatures - Array of all GeoJSON features in the current layer, used to determine the income range for color scaling.
  * @returns {object} Leaflet path styling options.
  */
-function getFeatureStyle(feature) {
+function getFeatureStyle(feature, allFeatures) {
   const income = feature.properties?.income ?? null;
+  const incomeRange = d3.extent(allFeatures, (f) => f.properties?.income ?? null);
   return {
-    fillColor: getIncomeColor(income),
-    weight: 0.75,
-    opacity: 1,
-    color: '#ffffff',
+    fillColor: getIncomeColor(income, incomeRange),
     fillOpacity: 0.8,
+    stroke: false,
   };
 }
 
@@ -110,7 +111,7 @@ function updateLegend(legendControl) {
     const from = grades[i];
     const to = grades[i + 1];
     const sampleValue = to ? (from + to) / 2 : from;
-    const color = getIncomeColor(sampleValue);
+    const color = getIncomeColor(sampleValue, [grades[0], grades[grades.length - 1]]);
 
     const labelText = to
       ? `$${(from / 1000).toFixed(0)}k &ndash; $${(to / 1000).toFixed(0)}k`

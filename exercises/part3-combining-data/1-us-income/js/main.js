@@ -260,7 +260,7 @@ async function showNationalView() {
 
     // 3. Render counties choropleth layer
     const countiesLayer = L.geoJSON(state.countiesGeojson, {
-      style: getFeatureStyle,
+      style: (feature) => getFeatureStyle(feature, state.countiesGeojson.features),
       onEachFeature: (feature, layer) => {
         const countyName = feature.properties?.NAMELSAD || feature.properties?.NAME || 'County';
         const income = feature.properties?.income;
@@ -352,7 +352,7 @@ async function showStateView(stateFips, stateName) {
 
     // 3. Render tracts choropleth layer
     const tractsLayer = L.geoJSON(tractsGeojson, {
-      style: getFeatureStyle,
+      style: (feature) => getFeatureStyle(feature, tractsGeojson.features),
       onEachFeature: (feature, layer) => {
         const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
         const income = feature.properties?.income;
@@ -446,7 +446,7 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
 
   // Render county tracts choropleth
   const countyTractsLayer = L.geoJSON(countyTracts, {
-    style: getFeatureStyle,
+    style: (feature) => getFeatureStyle(feature, countyTracts.features),
     onEachFeature: (feature, layer) => {
       const tractName = feature.properties?.NAMELSAD || `Tract ${feature.properties?.NAME}`;
       const income = feature.properties?.income;
