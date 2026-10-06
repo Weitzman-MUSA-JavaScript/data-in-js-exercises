@@ -78,7 +78,7 @@ import {
 /* global L */
 
 // Application State
-const state = {
+const app = {
   currentLevel: 'national', // 'national' | 'state' | 'county'
   currentStateFips: null,
   currentStateName: null,
@@ -155,8 +155,8 @@ function updateBreadcrumbs(items) {
 function handleBreadcrumbClick(level) {
   if (level === 'national') {
     showNationalView();
-  } else if (level === 'state' && state.currentStateFips) {
-    showStateView(state.currentStateFips, state.currentStateName);
+  } else if (level === 'state' && app.currentStateFips) {
+    showStateView(app.currentStateFips, app.currentStateName);
   }
 }
 
@@ -189,8 +189,8 @@ function getCountyGeoidFromGeoidfq(geoidfq) {
  * @returns {string} State name or fallback.
  */
 function getStateNameByFips(fips) {
-  if (!state.statesGeojson) return `State ${fips}`;
-  const feat = state.statesGeojson.features.find((f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === fips);
+  if (!app.statesGeojson) return `State ${fips}`;
+  const feat = app.statesGeojson.features.find((f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === fips);
   return feat?.properties?.NAME || `State ${fips}`;
 }
 
@@ -201,8 +201,8 @@ function getStateNameByFips(fips) {
  * @returns {string} County name or fallback.
  */
 function getCountyNameByGeoid(countyGeoid) {
-  if (!state.countiesGeojson) return `County ${countyGeoid}`;
-  const feat = state.countiesGeojson.features.find((f) => f.properties?.geoid === countyGeoid || f.properties?.GEOIDFQ?.endsWith(countyGeoid));
+  if (!app.countiesGeojson) return `County ${countyGeoid}`;
+  const feat = app.countiesGeojson.features.find((f) => f.properties?.geoid === countyGeoid || f.properties?.GEOIDFQ?.endsWith(countyGeoid));
   return feat?.properties?.NAMELSAD || feat?.properties?.NAME || `County ${countyGeoid}`;
 }
 
@@ -223,11 +223,11 @@ function formatIncome(income) {
  * Loads and displays the National level view (US counties + state outlines).
  */
 async function showNationalView() {
-  state.currentLevel = 'national';
-  state.currentStateFips = null;
-  state.currentStateName = null;
-  state.currentCountyGeoid = null;
-  state.currentCountyName = null;
+  app.currentLevel = 'national';
+  app.currentStateFips = null;
+  app.currentStateName = null;
+  app.currentCountyGeoid = null;
+  app.currentCountyName = null;
 
   updateBreadcrumbs([{ label: 'United States' }]);
 
@@ -244,23 +244,23 @@ async function showNationalView() {
     }
 
     // 1. Fetch geometries if not already cached
-    if (!state.countiesGeojson) {
-      state.countiesGeojson = await fetchCountiesGeoJSON();
+    if (!app.countiesGeojson) {
+      app.countiesGeojson = await fetchCountiesGeoJSON();
     }
-    if (!state.statesGeojson) {
-      state.statesGeojson = await fetchStatesGeoJSON();
+    if (!app.statesGeojson) {
+      app.statesGeojson = await fetchStatesGeoJSON();
     }
 
     // 2. Fetch Census county income data if not already cached
-    if (!state.countyIncomeLookup) {
+    if (!app.countyIncomeLookup) {
       const rawRows = await fetchCountyIncomeData(apiKey);
-      state.countyIncomeLookup = createIncomeLookup(rawRows);
-      joinIncomeData(state.countiesGeojson, state.countyIncomeLookup);
+      app.countyIncomeLookup = createIncomeLookup(rawRows);
+      joinIncomeData(app.countiesGeojson, app.countyIncomeLookup);
     }
 
     // 3. Render counties choropleth layer
-    const countiesLayer = L.geoJSON(state.countiesGeojson, {
-      style: (feature) => getFeatureStyle(feature, state.countiesGeojson.features),
+    const countiesLayer = L.geoJSON(app.countiesGeojson, {
+      style: (feature) => getFeatureStyle(feature, app.countiesGeojson.features),
       onEachFeature: (feature, layer) => {
         const countyName = feature.properties?.NAMELSAD || feature.properties?.NAME || 'County';
         const income = feature.properties?.income;
@@ -280,7 +280,7 @@ async function showNationalView() {
     dataLayerGroup.addLayer(countiesLayer);
 
     // 4. Render state outlines layer (thick borders)
-    const statesLayer = L.geoJSON(state.statesGeojson, {
+    const statesLayer = L.geoJSON(app.statesGeojson, {
       style: getStateOutlineStyle,
       interactive: true,
       onEachFeature: (feature, layer) => {
@@ -299,7 +299,7 @@ async function showNationalView() {
     map.setView([38, -96], 4);
   } catch (error) {
     console.error('Error rendering national view:', error);
-    alert(`Error loading US income data: ${error.message}`);
+    // alert(`Error loading US income data: ${error.message}`);
   } finally {
     setLoading(false);
   }
@@ -312,15 +312,15 @@ async function showNationalView() {
  * @param {string} [stateName] - State display name.
  */
 async function showStateView(stateFips, stateName) {
-  state.currentLevel = 'state';
-  state.currentStateFips = stateFips;
-  state.currentStateName = stateName || getStateNameByFips(stateFips);
-  state.currentCountyGeoid = null;
-  state.currentCountyName = null;
+  app.currentLevel = 'state';
+  app.currentStateFips = stateFips;
+  app.currentStateName = stateName || getStateNameByFips(stateFips);
+  app.currentCountyGeoid = null;
+  app.currentCountyName = null;
 
   updateBreadcrumbs([
     { label: 'United States', level: 'national' },
-    { label: state.currentStateName },
+    { label: app.currentStateName },
   ]);
 
   dataLayerGroup.clearLayers();
@@ -336,17 +336,17 @@ async function showStateView(stateFips, stateName) {
     }
 
     // 1. Fetch state tracts GeoJSON if not cached
-    if (!state.stateTractsGeojson.has(stateFips)) {
+    if (!app.stateTractsGeojson.has(stateFips)) {
       const tractsGeojson = await fetchStateTractsGeoJSON(stateFips);
-      state.stateTractsGeojson.set(stateFips, tractsGeojson);
+      app.stateTractsGeojson.set(stateFips, tractsGeojson);
     }
-    const tractsGeojson = state.stateTractsGeojson.get(stateFips);
+    const tractsGeojson = app.stateTractsGeojson.get(stateFips);
 
     // 2. Fetch Census tract income data if not cached
-    if (!state.stateTractIncomeLookup.has(stateFips)) {
+    if (!app.stateTractIncomeLookup.has(stateFips)) {
       const rawRows = await fetchTractIncomeData(stateFips, apiKey);
       const lookup = createIncomeLookup(rawRows);
-      state.stateTractIncomeLookup.set(stateFips, lookup);
+      app.stateTractIncomeLookup.set(stateFips, lookup);
       joinIncomeData(tractsGeojson, lookup);
     }
 
@@ -365,17 +365,17 @@ async function showStateView(stateFips, stateName) {
         );
 
         layer.on('click', () => {
-          showCountyView(stateFips, state.currentStateName, countyGeoid, countyName);
+          showCountyView(stateFips, app.currentStateName, countyGeoid, countyName);
         });
       },
     });
     dataLayerGroup.addLayer(tractsLayer);
 
     // 4. Render county outlines within this state
-    if (state.countiesGeojson) {
+    if (app.countiesGeojson) {
       const stateCounties = {
         type: 'FeatureCollection',
-        features: state.countiesGeojson.features.filter(
+        features: app.countiesGeojson.features.filter(
           (f) => getStateFipsFromGeoidfq(f.properties?.GEOIDFQ) === stateFips,
         ),
       };
@@ -389,7 +389,7 @@ async function showStateView(stateFips, stateName) {
 
           layer.on('click', (evt) => {
             L.DomEvent.stopPropagation(evt);
-            showCountyView(stateFips, state.currentStateName, countyGeoid, countyName);
+            showCountyView(stateFips, app.currentStateName, countyGeoid, countyName);
           });
         },
       });
@@ -417,9 +417,9 @@ async function showStateView(stateFips, stateName) {
  * @param {string} countyName - County display name.
  */
 function showCountyView(stateFips, stateName, countyGeoid, countyName) {
-  state.currentLevel = 'county';
-  state.currentCountyGeoid = countyGeoid;
-  state.currentCountyName = countyName;
+  app.currentLevel = 'county';
+  app.currentCountyGeoid = countyGeoid;
+  app.currentCountyName = countyName;
 
   updateBreadcrumbs([
     { label: 'United States', level: 'national' },
@@ -430,7 +430,7 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
   dataLayerGroup.clearLayers();
   outlineLayerGroup.clearLayers();
 
-  const stateTracts = state.stateTractsGeojson.get(stateFips);
+  const stateTracts = app.stateTractsGeojson.get(stateFips);
   if (!stateTracts) {
     showStateView(stateFips, stateName);
     return;
@@ -460,10 +460,10 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
   dataLayerGroup.addLayer(countyTractsLayer);
 
   // Render thick boundary for this county
-  if (state.countiesGeojson) {
+  if (app.countiesGeojson) {
     const singleCounty = {
       type: 'FeatureCollection',
-      features: state.countiesGeojson.features.filter(
+      features: app.countiesGeojson.features.filter(
         (f) => getCountyGeoidFromGeoidfq(f.properties?.GEOIDFQ) === countyGeoid,
       ),
     };
@@ -490,10 +490,10 @@ function showCountyView(stateFips, stateName, countyGeoid, countyName) {
 // Initialize API key handlers and initial view
 initCensusKey((newKey) => {
   if (newKey) {
-    if (state.currentLevel === 'county') {
-      showCountyView(state.currentStateFips, state.currentStateName, state.currentCountyGeoid, state.currentCountyName);
-    } else if (state.currentLevel === 'state') {
-      showStateView(state.currentStateFips, state.currentStateName);
+    if (app.currentLevel === 'county') {
+      showCountyView(app.currentStateFips, app.currentStateName, app.currentCountyGeoid, app.currentCountyName);
+    } else if (app.currentLevel === 'state') {
+      showStateView(app.currentStateFips, app.currentStateName);
     } else {
       showNationalView();
     }
