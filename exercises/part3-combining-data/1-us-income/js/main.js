@@ -57,16 +57,19 @@ import {
 } from './income-map.js';
 
 import {
-  fetchCountiesGeoJSON,
-  fetchStatesGeoJSON,
-  fetchStateTractsGeoJSON,
   fetchCountyIncomeData,
   fetchTractIncomeData,
   createIncomeLookup,
   joinIncomeData,
+} from './income.js';
+
+import {
+  fetchCountiesGeoJSON,
+  fetchStatesGeoJSON,
+  fetchStateTractsGeoJSON,
   getStateFipsFromGeoidfq,
   getCountyGeoidFromGeoidfq,
-} from './income.js';
+} from './places.js';
 
 import {
   getCensusApiKey,

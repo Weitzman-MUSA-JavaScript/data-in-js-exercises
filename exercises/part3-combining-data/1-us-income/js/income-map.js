@@ -9,7 +9,7 @@ import {
   getIncomeRange,
   getStateFipsFromGeoidfq,
   getCountyGeoidFromGeoidfq,
-} from './income.js';
+} from './places.js';
 
 /* global L */
 
