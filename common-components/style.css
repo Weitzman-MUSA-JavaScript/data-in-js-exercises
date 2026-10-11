@@ -236,3 +236,59 @@ dialog::backdrop {
     width: 0%;
   }
 }
+
+/* Leaflet popups & tooltips */
+.leaflet-container {
+  font-family: var(--font-sans);
+}
+
+.leaflet-popup-content-wrapper {
+  border: 1.5px solid var(--color-primary);
+  border-top-width: 4px;
+  border-radius: 0.25rem;
+}
+
+.leaflet-popup-content {
+  font-family: var(--font-mono);
+}
+
+.leaflet-popup-tip {
+  border: 1.5px solid var(--color-primary);
+  box-sizing: border-box;
+}
+
+.leaflet-tooltip {
+  border: 1px solid var(--color-primary);
+  border-top-width: 4px;
+  border-radius: 0.25rem;
+  font-family: var(--font-mono);
+}
+
+/* Billboard.js chart tooltips */
+.bb-tooltip-container {
+  border: 1px solid #ddd;
+  border-top: 4px solid var(--color-primary);
+  border-radius: 0.25rem;
+  background-color: var(--color-background);
+}
+
+.bb-tooltip {
+  border-style: hidden;
+  background-color: transparent;
+}
+
+.bb-tooltip th {
+  font-family: var(--font-sans);
+  font-weight: bold;
+  color: var(--color-primary);
+  background-color: transparent;
+}
+
+.bb-tooltip tr {
+  border: unset;
+}
+
+.bb-tooltip td {
+  border-color: var(--color-primary);
+  font-family: var(--font-mono);
+}
