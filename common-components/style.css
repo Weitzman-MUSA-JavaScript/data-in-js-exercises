@@ -264,6 +264,35 @@ dialog::backdrop {
   font-family: var(--font-mono);
 }
 
+/* MaplibreGL popups */
+.maplibregl-map {
+  font-family: var(--font-sans);
+}
+
+.maplibregl-popup-content {
+  border: 1.5px solid var(--color-primary);
+  border-top-width: 4px;
+  border-radius: 0.25rem;
+  font-family: var(--font-mono);
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--color-primary);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--color-primary);
+}
+
+.maplibregl-popup-close-button {
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.maplibregl-popup-close-button:hover {
+	background-color: var(--color-background);
+}
+
 /* Billboard.js chart tooltips */
 .bb-tooltip-container {
   border: 1px solid #ddd;
